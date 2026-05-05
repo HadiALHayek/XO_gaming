@@ -184,7 +184,11 @@ export function ReservationFormDialog({
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="r-phone">Phone</Label>
-              <Input id="r-phone" {...form.register("customerPhone")} />
+              <Input
+                id="r-phone"
+                placeholder="09XXXXXXXX or +9639XXXXXXXX"
+                {...form.register("customerPhone")}
+              />
               {form.formState.errors.customerPhone ? (
                 <p className="text-xs text-red-400">
                   {form.formState.errors.customerPhone.message}

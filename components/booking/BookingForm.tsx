@@ -210,7 +210,7 @@ export function BookingForm({ devices }: Props) {
                 <Label htmlFor="customerPhone">{t.book.phone}</Label>
                 <Input
                   id="customerPhone"
-                  placeholder="+1 555 0100"
+                  placeholder="09XXXXXXXX or +9639XXXXXXXX"
                   {...form.register("customerPhone")}
                 />
                 {form.formState.errors.customerPhone ? (

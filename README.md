@@ -27,6 +27,7 @@ Modern reservation platform for 10 PCs and 4 PS5 stations.
 - Reservations table with filters (date, device, status) and full CRUD.
 - Device management (online/offline toggle).
 - Blocked-slot (maintenance) management.
+- Homepage video management (upload/replace/delete).
 
 ### Rules
 - Overlap prevented using:
@@ -94,6 +95,9 @@ Only these two variables are required.
 ### 4. Create tables + seed devices
 
 Open Supabase SQL Editor and run `supabase/schema.sql`.
+This also creates:
+- `site_settings` (stores current homepage video)
+- `home-videos` storage bucket + policies
 
 ### 5. Create the Admin User
 

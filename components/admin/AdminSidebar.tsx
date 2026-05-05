@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   CalendarDays,
+  Clapperboard,
   Gauge,
   Gamepad2,
   LogOut,
@@ -19,6 +20,7 @@ const links = [
   { href: "/admin/reservations", label: "Reservations", icon: CalendarDays },
   { href: "/admin/devices", label: "Devices", icon: Gamepad2 },
   { href: "/admin/blocked-slots", label: "Maintenance", icon: ShieldAlert },
+  { href: "/admin/media", label: "Homepage Media", icon: Clapperboard },
 ];
 
 export function AdminSidebar({ email }: { email?: string | null }) {

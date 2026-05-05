@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { checkAvailability } from "@/lib/reservations/availability";
 import {
+  normalizeSyrianPhone,
   reservationCreateSchema,
   reservationUpdateSchema,
   type ReservationCreateInput,
@@ -23,6 +24,8 @@ export async function createReservation(input: ReservationCreateInput): Promise<
 
   const start = new Date(parsed.data.startTime);
   const end = new Date(start.getTime() + parsed.data.durationHours * 60 * 60 * 1000);
+  const normalizedPhone = normalizeSyrianPhone(parsed.data.customerPhone);
+  if (!normalizedPhone) return { ok: false, error: "Invalid phone format." };
   const availability = await checkAvailability(parsed.data.deviceId, start, end);
   if (!availability.ok) return { ok: false, error: availability.message };
 
@@ -31,7 +34,7 @@ export async function createReservation(input: ReservationCreateInput): Promise<
     .from("reservations")
     .insert({
       customer_name: parsed.data.customerName.trim(),
-      customer_phone: parsed.data.customerPhone?.trim() || null,
+      customer_phone: normalizedPhone,
       customer_discord: parsed.data.customerDiscord?.trim() || null,
       device_id: parsed.data.deviceId,
       start_time: start.toISOString(),
@@ -56,6 +59,8 @@ export async function updateReservation(input: ReservationUpdateInput): Promise<
 
   const start = new Date(parsed.data.startTime);
   const end = new Date(start.getTime() + parsed.data.durationHours * 60 * 60 * 1000);
+  const normalizedPhone = normalizeSyrianPhone(parsed.data.customerPhone);
+  if (!normalizedPhone) return { ok: false, error: "Invalid phone format." };
 
   const supabase = await createSupabaseServerClient();
   const [{ data: existingRows, error: existingError }, { data: blockedRows, error: blockedError }] = await Promise.all([
@@ -82,7 +87,7 @@ export async function updateReservation(input: ReservationUpdateInput): Promise<
     .from("reservations")
     .update({
       customer_name: parsed.data.customerName.trim(),
-      customer_phone: parsed.data.customerPhone?.trim() || null,
+      customer_phone: normalizedPhone,
       customer_discord: parsed.data.customerDiscord?.trim() || null,
       device_id: parsed.data.deviceId,
       start_time: start.toISOString(),

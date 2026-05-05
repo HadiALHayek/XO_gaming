@@ -13,13 +13,33 @@ const isoDate = z
     message: "Invalid date",
   });
 
+const syrianLocalPhoneRegex = /^09\d{8}$/;
+const syrianIntlPhoneRegex = /^\+{1,2}9639\d{8}$/;
+
+export function normalizeSyrianPhone(value: string) {
+  const raw = value.replace(/\s+/g, "");
+  if (syrianIntlPhoneRegex.test(raw)) {
+    return `+963${raw.replace(/^\+{1,2}963/, "")}`;
+  }
+  if (syrianLocalPhoneRegex.test(raw)) {
+    return `+963${raw.slice(1)}`;
+  }
+  return null;
+}
+
 export const reservationCreateSchema = z
   .object({
     customerName: z
       .string()
       .min(2, "Name must be at least 2 characters")
       .max(80, "Name is too long"),
-    customerPhone: z.string().max(30, "Phone is too long").optional().or(z.literal("")),
+    customerPhone: z
+      .string()
+      .min(1, "Phone number is required")
+      .max(30, "Phone is too long")
+      .refine((value) => normalizeSyrianPhone(value) !== null, {
+        message: "Use a valid Syrian mobile: 09XXXXXXXX or +9639XXXXXXXX",
+      }),
     customerDiscord: z
       .string()
       .max(60, "Discord handle is too long")

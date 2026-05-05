@@ -5,11 +5,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { DeviceCard } from "@/components/DeviceCard";
 import { getDevicesWithCurrentStatus } from "@/lib/queries";
 import { getDictionary } from "@/lib/i18n/server";
+import { getSiteSettings } from "@/lib/supabase/data";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [devices, { t }] = await Promise.all([getDevicesWithCurrentStatus(), getDictionary()]);
+  const [devices, { t }, settings] = await Promise.all([
+    getDevicesWithCurrentStatus(),
+    getDictionary(),
+    getSiteSettings().catch(() => null),
+  ]);
 
   const pcCount = devices.filter((d) => d.type === "PC").length;
   const ps5Count = devices.filter((d) => d.type === "PS5").length;
@@ -106,6 +111,32 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {settings?.home_video_url ? (
+        <section className="space-y-4">
+          <div>
+            <h2 className="font-display text-2xl font-bold md:text-3xl">
+              <span className="gradient-text">XO</span> Highlights
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Watch the latest promo from the lounge.
+            </p>
+          </div>
+          <Card className="overflow-hidden">
+            <CardContent className="p-0">
+              <video
+                src={settings.home_video_url}
+                controls
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="max-h-[540px] w-full bg-black object-cover"
+              />
+            </CardContent>
+          </Card>
+        </section>
+      ) : null}
 
       <section id="availability" className="space-y-6">
         <div className="flex items-end justify-between gap-4">

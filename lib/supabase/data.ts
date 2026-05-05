@@ -5,6 +5,7 @@ import type {
   Device,
   Reservation,
   ReservationWithDevice,
+  SiteSettings,
 } from "@/types";
 
 export async function listDevices(): Promise<Device[]> {
@@ -88,5 +89,16 @@ export async function listBlockedSlotsWithDevice(
     .limit(limit);
   if (error) throw new Error(error.message);
   return (data as BlockedSlotWithDevice[]) ?? [];
+}
+
+export async function getSiteSettings(): Promise<SiteSettings | null> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("site_settings")
+    .select("*")
+    .eq("id", 1)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return (data as SiteSettings | null) ?? null;
 }
 

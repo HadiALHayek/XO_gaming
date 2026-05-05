@@ -39,3 +39,10 @@ export type AvailabilityEvent = {
   type: "RESERVATION" | "BLOCKED";
 };
 
+export type SiteSettings = {
+  id: number;
+  home_video_url: string | null;
+  home_video_path: string | null;
+  updated_at: string;
+};
+
