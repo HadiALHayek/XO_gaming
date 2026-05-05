@@ -24,12 +24,14 @@ import {
 import { createReservation } from "@/actions/reservations";
 import { CalendarView } from "./CalendarView";
 import { toDateTimeLocalInput } from "@/lib/dates";
+import { useI18n } from "@/components/providers/I18nProvider";
 
 type Props = {
   devices: Device[];
 };
 
 export function BookingForm({ devices }: Props) {
+  const { t } = useI18n();
   const [isPending, startTransition] = useTransition();
   const [calendarTick, setCalendarTick] = useState(0);
 
@@ -70,7 +72,7 @@ export function BookingForm({ devices }: Props) {
     form.setValue("durationHours", Math.min(12, duration), {
       shouldValidate: true,
     });
-    toast.message("Time slot selected", {
+    toast.message(t.book.timeSlotSelected, {
       description: `${start.toLocaleString()} - ${end.toLocaleTimeString()}`,
     });
   };
@@ -90,12 +92,12 @@ export function BookingForm({ devices }: Props) {
             });
           }
         }
-        toast.error("Booking failed", { description: result.error });
+        toast.error(t.book.bookingFailed, { description: result.error });
         return;
       }
 
-      toast.success("Reservation confirmed!", {
-        description: "We'll see you soon at XO Gaming.",
+      toast.success(t.book.reservationConfirmed, {
+        description: t.book.seeYouSoon,
       });
       form.reset({
         ...form.getValues(),
@@ -112,7 +114,7 @@ export function BookingForm({ devices }: Props) {
     return (
       <Card>
         <CardContent className="p-10 text-center text-sm text-muted-foreground">
-          No devices configured. Run the seed script and refresh.
+          {t.book.noDevicesConfigured}
         </CardContent>
       </Card>
     );
@@ -126,16 +128,16 @@ export function BookingForm({ devices }: Props) {
         <CardContent className="space-y-5 p-6">
           <div>
             <h2 className="font-display text-xl font-semibold">
-              Reserve a station
+              {t.book.reserveStation}
             </h2>
             <p className="text-xs text-muted-foreground">
-              1 to 12 hour sessions. No payment required.
+              {t.book.reserveHint}
             </p>
           </div>
 
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="deviceId">Device</Label>
+              <Label htmlFor="deviceId">{t.book.device}</Label>
               <Select
                 value={deviceId}
                 onValueChange={(value) =>
@@ -143,7 +145,7 @@ export function BookingForm({ devices }: Props) {
                 }
               >
                 <SelectTrigger id="deviceId">
-                  <SelectValue placeholder="Choose a device" />
+                  <SelectValue placeholder={t.book.chooseDevice} />
                 </SelectTrigger>
                 <SelectContent>
                   {devices.map((device) => (
@@ -167,7 +169,7 @@ export function BookingForm({ devices }: Props) {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="startTime">Start</Label>
+                <Label htmlFor="startTime">{t.book.start}</Label>
                 <Input
                   id="startTime"
                   type="datetime-local"
@@ -180,7 +182,7 @@ export function BookingForm({ devices }: Props) {
                 ) : null}
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="durationHours">Duration (hours)</Label>
+                <Label htmlFor="durationHours">{t.book.duration}</Label>
                 <Input id="durationHours" type="number" min={1} max={12} {...form.register("durationHours", { valueAsNumber: true })} />
                 {form.formState.errors.durationHours ? (
                   <p className="text-xs text-red-400">
@@ -192,7 +194,7 @@ export function BookingForm({ devices }: Props) {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="customerName">Full name</Label>
+                <Label htmlFor="customerName">{t.book.fullName}</Label>
                 <Input
                   id="customerName"
                   placeholder="Alex Carter"
@@ -205,7 +207,7 @@ export function BookingForm({ devices }: Props) {
                 ) : null}
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="customerPhone">Phone</Label>
+                <Label htmlFor="customerPhone">{t.book.phone}</Label>
                 <Input
                   id="customerPhone"
                   placeholder="+1 555 0100"
@@ -220,7 +222,7 @@ export function BookingForm({ devices }: Props) {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="customerDiscord">Discord (optional)</Label>
+              <Label htmlFor="customerDiscord">{t.book.discord}</Label>
               <Input
                 id="customerDiscord"
                 placeholder="alex#0001"
@@ -229,10 +231,10 @@ export function BookingForm({ devices }: Props) {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="notes">Notes (optional)</Label>
+              <Label htmlFor="notes">{t.book.notes}</Label>
               <Textarea
                 id="notes"
-                placeholder="Anything we should know?"
+                placeholder={t.book.notesPlaceholder}
                 {...form.register("notes")}
               />
             </div>
@@ -243,20 +245,20 @@ export function BookingForm({ devices }: Props) {
               className="w-full"
               disabled={isPending}
             >
-              {isPending ? "Booking..." : "Confirm reservation"}
+              {isPending ? t.book.booking : t.book.confirm}
             </Button>
 
             {selectedDevice ? (
               <p className="text-xs text-muted-foreground">
-                Booking{" "}
+                {t.book.bookingSummary}{" "}
                 <span className="text-foreground">
                   {selectedDevice.name} ({selectedDevice.type})
                 </span>{" "}
-                from{" "}
+                {t.book.from}{" "}
                 <span className="text-foreground">
                   {new Date(startTime).toLocaleString()}
                 </span>{" "}
-                to{" "}
+                {t.book.to}{" "}
                 <span className="text-foreground">
                   {new Date(new Date(startTime).getTime() + durationHours * 3600000).toLocaleString()}
                 </span>
@@ -272,14 +274,14 @@ export function BookingForm({ devices }: Props) {
           <div className="mb-4 flex flex-wrap items-center gap-3 text-xs">
             <span className="inline-flex items-center gap-2 text-muted-foreground">
               <span className="h-2 w-2 rounded-full bg-neon-purple" />
-              Reserved
+              {t.book.reserved}
             </span>
             <span className="inline-flex items-center gap-2 text-muted-foreground">
               <span className="h-2 w-2 rounded-full bg-red-400" />
-              Maintenance
+              {t.book.maintenance}
             </span>
             <span className="inline-flex items-center gap-2 text-muted-foreground">
-              Drag to select a slot on the calendar
+              {t.book.dragToSelect}
             </span>
           </div>
           <CalendarView

@@ -10,6 +10,7 @@ import { StatsCards } from "@/components/StatsCards";
 import { ReservationCard } from "@/components/ReservationCard";
 import { Button } from "@/components/ui/button";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getDictionary } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +19,7 @@ export const metadata = {
 };
 
 export default async function AdminOverviewPage() {
+  const { t } = await getDictionary();
   const now = new Date();
   const next24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
   const supabase = await createSupabaseServerClient();
@@ -42,7 +44,7 @@ export default async function AdminOverviewPage() {
         <div>
           <h1 className="font-display text-2xl font-bold">Overview</h1>
           <p className="text-sm text-muted-foreground">
-            What is happening at XO Gaming right now.
+            {t.admin.overviewHint}
           </p>
         </div>
         <Button asChild variant="outline" size="sm">

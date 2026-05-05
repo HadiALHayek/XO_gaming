@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/actions/auth";
 import { cn } from "@/lib/utils";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 const links = [
   { href: "/admin", label: "Overview", icon: Gauge, exact: true },
@@ -62,6 +63,7 @@ export function AdminSidebar({ email }: { email?: string | null }) {
       </nav>
 
       <div className="space-y-2 border-t border-white/5 pt-3">
+        <LanguageSwitcher />
         {email ? (
           <div className="px-2 text-xs text-muted-foreground">
             Signed in as

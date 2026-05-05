@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { DeviceCard } from "@/components/DeviceCard";
 import { getDevicesWithCurrentStatus } from "@/lib/queries";
+import { getDictionary } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const devices = await getDevicesWithCurrentStatus();
+  const [devices, { t }] = await Promise.all([getDevicesWithCurrentStatus(), getDictionary()]);
 
   const pcCount = devices.filter((d) => d.type === "PC").length;
   const ps5Count = devices.filter((d) => d.type === "PS5").length;
@@ -21,40 +22,37 @@ export default async function HomePage() {
           <div className="space-y-6">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
               <Sparkles className="h-3.5 w-3.5 text-neon-cyan" />
-              <span>No payment - reserve in seconds</span>
+              <span>{t.home.badge}</span>
             </div>
             <h1 className="font-display text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl">
-              Plug in.{" "}
-              <span className="gradient-text">Power up.</span>
+              {t.home.heroLine1}{" "}
+              <span className="gradient-text">{t.home.heroLine2}</span>
               <br />
-              Play at <span className="gradient-text">XO Gaming.</span>
+              {t.home.heroLine3} <span className="gradient-text">{t.brand}.</span>
             </h1>
             <p className="max-w-xl text-base text-muted-foreground md:text-lg">
-              {pcCount} high-end gaming PCs and {ps5Count} PlayStation 5 stations,
-              ready when you are. Pick a device, choose your slot, and we will
-              keep the lights on.
+              {pcCount} {t.home.gamingPcs.toLowerCase()} + {ps5Count} {t.home.playstation}. {t.home.heroDescription}
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <Button asChild size="xl">
                 <Link href="/book">
                   <CalendarCheck className="h-4 w-4" />
-                  Book a session
+                  {t.home.ctaBook}
                 </Link>
               </Button>
               <Button asChild size="xl" variant="outline">
-                <Link href="#availability">View availability</Link>
+                <Link href="#availability">{t.home.ctaAvailability}</Link>
               </Button>
             </div>
             <div className="flex flex-wrap gap-3 pt-2 text-xs text-muted-foreground">
               <span className="inline-flex items-center gap-2">
-                <Zap className="h-3.5 w-3.5 text-neon-cyan" /> Live availability
+                <Zap className="h-3.5 w-3.5 text-neon-cyan" /> {t.home.liveAvailability}
               </span>
               <span className="inline-flex items-center gap-2">
-                <Gamepad2 className="h-3.5 w-3.5 text-neon-purple" /> 14 stations
+                <Gamepad2 className="h-3.5 w-3.5 text-neon-purple" /> {t.home.stations}
               </span>
               <span className="inline-flex items-center gap-2">
-                <Monitor className="h-3.5 w-3.5 text-neon-cyan" /> 1-12 hour
-                sessions
+                <Monitor className="h-3.5 w-3.5 text-neon-cyan" /> {t.home.sessions}
               </span>
             </div>
           </div>
@@ -64,7 +62,7 @@ export default async function HomePage() {
               <CardContent className="flex items-center justify-between p-6">
                 <div>
                   <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                    Available now
+                    {t.home.availableNow}
                   </div>
                   <div className="font-display text-4xl font-bold">
                     {availableNow}
@@ -83,7 +81,7 @@ export default async function HomePage() {
               <Card>
                 <CardContent className="p-5">
                   <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                    Gaming PCs
+                    {t.home.gamingPcs}
                   </div>
                   <div className="font-display text-3xl font-bold">{pcCount}</div>
                   <div className="text-xs text-muted-foreground">
@@ -94,7 +92,7 @@ export default async function HomePage() {
               <Card>
                 <CardContent className="p-5">
                   <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                    PlayStation 5
+                    {t.home.playstation}
                   </div>
                   <div className="font-display text-3xl font-bold">
                     {ps5Count}
@@ -113,15 +111,14 @@ export default async function HomePage() {
         <div className="flex items-end justify-between gap-4">
           <div>
             <h2 className="font-display text-2xl font-bold md:text-3xl">
-              <span className="gradient-text">Live</span> device status
+              <span className="gradient-text">Live</span> {t.home.liveDeviceStatus}
             </h2>
             <p className="text-sm text-muted-foreground">
-              A snapshot of the floor right now. Tap a device to see its
-              schedule.
+              {t.home.snapshot}
             </p>
           </div>
           <Button asChild variant="outline" size="sm">
-            <Link href="/book">Book a slot</Link>
+            <Link href="/book">{t.home.bookSlot}</Link>
           </Button>
         </div>
 
@@ -129,9 +126,9 @@ export default async function HomePage() {
           <Card>
             <CardContent className="flex flex-col items-center gap-2 p-10 text-center">
               <Sparkles className="h-6 w-6 text-neon-cyan" />
-              <div className="text-sm font-medium">No devices yet</div>
+              <div className="text-sm font-medium">{t.home.noDevices}</div>
               <p className="text-xs text-muted-foreground">
-                Run the database seed to create the 10 PCs and 4 PS5 stations.
+                {t.home.noDevicesHint}
               </p>
             </CardContent>
           </Card>

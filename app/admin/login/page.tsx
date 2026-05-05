@@ -4,12 +4,14 @@ import { LoginForm } from "./LoginForm";
 import { getAdminUser } from "@/lib/auth";
 import { isSupabaseConfigured } from "@/lib/env";
 import { Card, CardContent } from "@/components/ui/card";
+import { getDictionary } from "@/lib/i18n/server";
 
 export const metadata = {
   title: "Admin login",
 };
 
 export default async function LoginPage() {
+  const { t } = await getDictionary();
   const supabaseReady = isSupabaseConfigured();
   if (supabaseReady) {
     const user = await getAdminUser();
@@ -29,7 +31,7 @@ export default async function LoginPage() {
                 Admin sign in
               </h1>
               <p className="text-xs text-muted-foreground">
-                Restricted area for XO Gaming staff.
+                {t.admin.restricted}
               </p>
             </div>
           </div>

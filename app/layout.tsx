@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
+import { I18nProvider } from "@/components/providers/I18nProvider";
+import { getCurrentLocale } from "@/lib/i18n/server";
 
 const siteUrl = "http://localhost:3000";
 
@@ -48,17 +50,21 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getCurrentLocale();
+  const dir = locale === "ar" ? "rtl" : "ltr";
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang={locale} dir={dir} className="dark" suppressHydrationWarning>
       <body className="min-h-dvh font-sans antialiased">
-        <AnimatedBackground />
-        {children}
-        <Toaster />
+        <I18nProvider locale={locale}>
+          <AnimatedBackground />
+          {children}
+          <Toaster />
+        </I18nProvider>
       </body>
     </html>
   );

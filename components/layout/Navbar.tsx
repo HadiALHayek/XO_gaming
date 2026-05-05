@@ -2,9 +2,11 @@ import Link from "next/link";
 import { Gamepad2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getAdminUser } from "@/lib/auth";
+import { getDictionary } from "@/lib/i18n/server";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export async function Navbar() {
-  const user = await getAdminUser();
+  const [user, { t }] = await Promise.all([getAdminUser(), getDictionary()]);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-white/5 bg-background/60 backdrop-blur-xl">
@@ -17,7 +19,7 @@ export async function Navbar() {
             <Gamepad2 className="h-5 w-5 text-white" />
           </span>
           <span className="gradient-text font-display tracking-tight">
-            XO Gaming
+            {t.brand}
           </span>
         </Link>
 
@@ -26,28 +28,31 @@ export async function Navbar() {
             href="/"
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
-            Home
+            {t.nav.home}
           </Link>
           <Link
             href="/book"
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
-            Book
+            {t.nav.book}
           </Link>
           <Link
             href={user ? "/admin" : "/admin/login"}
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
-            Admin
+            {t.nav.admin}
           </Link>
         </nav>
 
         <div className="flex items-center gap-2">
+          <div>
+            <LanguageSwitcher />
+          </div>
           <Button asChild size="sm" variant="neon" className="hidden sm:inline-flex">
-            <Link href="/book">Book Now</Link>
+            <Link href="/book">{t.nav.bookNow}</Link>
           </Button>
           <Button asChild size="sm" className="sm:hidden">
-            <Link href="/book">Book</Link>
+            <Link href="/book">{t.nav.book}</Link>
           </Button>
         </div>
       </div>
