@@ -95,7 +95,7 @@ export function BookingForm({ devices }: Props) {
       }
 
       toast.success("Reservation confirmed!", {
-        description: "We'll see you soon at NeonArena.",
+        description: "We'll see you soon at XO Gaming.",
       });
       form.reset({
         ...form.getValues(),

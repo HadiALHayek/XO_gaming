@@ -27,7 +27,7 @@ export default async function HomePage() {
               Plug in.{" "}
               <span className="gradient-text">Power up.</span>
               <br />
-              Play at <span className="gradient-text">NeonArena.</span>
+              Play at <span className="gradient-text">XO Gaming.</span>
             </h1>
             <p className="max-w-xl text-base text-muted-foreground md:text-lg">
               {pcCount} high-end gaming PCs and {ps5Count} PlayStation 5 stations,

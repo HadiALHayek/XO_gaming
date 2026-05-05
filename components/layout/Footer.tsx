@@ -7,7 +7,7 @@ export function Footer() {
       <div className="container flex flex-col items-center justify-between gap-4 py-8 text-sm text-muted-foreground md:flex-row">
         <div className="flex items-center gap-2">
           <Gamepad2 className="h-4 w-4 text-neon-cyan" />
-          <span>NeonArena Gaming Center</span>
+          <span>XO Gaming</span>
         </div>
         <div className="flex items-center gap-6">
           <Link href="/" className="hover:text-foreground">
@@ -20,7 +20,7 @@ export function Footer() {
             Admin
           </Link>
         </div>
-        <div>(c) {new Date().getFullYear()} NeonArena. All rights reserved.</div>
+        <div>(c) {new Date().getFullYear()} XO Gaming. All rights reserved.</div>
       </div>
     </footer>
   );

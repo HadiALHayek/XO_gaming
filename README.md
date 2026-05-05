@@ -1,4 +1,4 @@
-## NeonArena - Gaming Center Reservations (No User Login)
+## XO Gaming - Gaming Center Reservations (No User Login)
 
 Modern reservation platform for 10 PCs and 4 PS5 stations.
 

@@ -29,7 +29,7 @@ export default async function LoginPage() {
                 Admin sign in
               </h1>
               <p className="text-xs text-muted-foreground">
-                Restricted area for NeonArena staff.
+                Restricted area for XO Gaming staff.
               </p>
             </div>
           </div>

@@ -8,12 +8,12 @@ const siteUrl = "http://localhost:3000";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "NeonArena - Gaming Center Reservations",
-    template: "%s | NeonArena",
+    default: "XO Gaming - Gaming Center Reservations",
+    template: "%s | XO Gaming",
   },
   description:
-    "Book gaming PCs and PlayStation 5 sessions at NeonArena. Live availability, instant confirmation, no payment required.",
-  applicationName: "NeonArena",
+    "Book gaming PCs and PlayStation 5 sessions at XO Gaming. Live availability, instant confirmation, no payment required.",
+  applicationName: "XO Gaming",
   keywords: [
     "gaming center",
     "esports",
@@ -22,18 +22,18 @@ export const metadata: Metadata = {
     "gaming cafe",
   ],
   openGraph: {
-    title: "NeonArena - Gaming Center Reservations",
+    title: "XO Gaming - Gaming Center Reservations",
     description:
-      "Book gaming PCs and PlayStation 5 sessions at NeonArena. Live availability, instant confirmation.",
+      "Book gaming PCs and PlayStation 5 sessions at XO Gaming. Live availability, instant confirmation.",
     url: siteUrl,
-    siteName: "NeonArena",
+    siteName: "XO Gaming",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "NeonArena - Gaming Center Reservations",
+    title: "XO Gaming - Gaming Center Reservations",
     description:
-      "Book gaming PCs and PlayStation 5 sessions at NeonArena.",
+      "Book gaming PCs and PlayStation 5 sessions at XO Gaming.",
   },
   icons: {
     icon: [

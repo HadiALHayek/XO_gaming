@@ -42,7 +42,7 @@ export default async function AdminOverviewPage() {
         <div>
           <h1 className="font-display text-2xl font-bold">Overview</h1>
           <p className="text-sm text-muted-foreground">
-            What is happening at NeonArena right now.
+            What is happening at XO Gaming right now.
           </p>
         </div>
         <Button asChild variant="outline" size="sm">

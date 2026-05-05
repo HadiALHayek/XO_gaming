@@ -17,7 +17,7 @@ export async function Navbar() {
             <Gamepad2 className="h-5 w-5 text-white" />
           </span>
           <span className="gradient-text font-display tracking-tight">
-            NeonArena
+            XO Gaming
           </span>
         </Link>
 
