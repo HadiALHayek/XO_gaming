@@ -3,17 +3,19 @@ import { CalendarCheck, Gamepad2, Monitor, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { DeviceCard } from "@/components/DeviceCard";
+import { GameLogosCarousel } from "@/components/home/GameLogosCarousel";
 import { getDevicesWithCurrentStatus } from "@/lib/queries";
 import { getDictionary } from "@/lib/i18n/server";
-import { getSiteSettings } from "@/lib/supabase/data";
+import { getSiteSettings, listHomeLogoImages } from "@/lib/supabase/data";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [devices, { t }, settings] = await Promise.all([
+  const [devices, { t }, settings, logos] = await Promise.all([
     getDevicesWithCurrentStatus(),
     getDictionary(),
     getSiteSettings().catch(() => null),
+    listHomeLogoImages().catch(() => []),
   ]);
 
   const pcCount = devices.filter((d) => d.type === "PC").length;
@@ -137,6 +139,8 @@ export default async function HomePage() {
           </Card>
         </section>
       ) : null}
+
+      {logos.length > 0 ? <GameLogosCarousel logos={logos} /> : null}
 
       <section id="availability" className="space-y-6">
         <div className="flex items-end justify-between gap-4">

@@ -83,6 +83,13 @@ create table if not exists public.site_settings (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.home_logo_images (
+  id uuid primary key default gen_random_uuid(),
+  image_path text not null unique,
+  image_url text not null,
+  created_at timestamptz not null default now()
+);
+
 insert into public.site_settings (id)
 values (1)
 on conflict (id) do nothing;
@@ -93,6 +100,7 @@ create index if not exists idx_blocked_slots_device_start on public.blocked_slot
 create index if not exists idx_blocked_slots_device_end on public.blocked_slots(device_id, end_time);
 create index if not exists idx_matches_date on public.matches(match_date);
 create index if not exists idx_match_reservations_match on public.match_reservations(match_id);
+create index if not exists idx_home_logo_images_created_at on public.home_logo_images(created_at desc);
 
 insert into public.devices (name, type)
 values
@@ -118,6 +126,7 @@ alter table public.blocked_slots enable row level security;
 alter table public.site_settings enable row level security;
 alter table public.matches enable row level security;
 alter table public.match_reservations enable row level security;
+alter table public.home_logo_images enable row level security;
 
 -- Public read access (for live availability)
 drop policy if exists "public read devices" on public.devices;
@@ -138,6 +147,10 @@ for select to anon using (true);
 
 drop policy if exists "public read match_reservations" on public.match_reservations;
 create policy "public read match_reservations" on public.match_reservations
+for select to anon using (true);
+
+drop policy if exists "public read home_logo_images" on public.home_logo_images;
+create policy "public read home_logo_images" on public.home_logo_images
 for select to anon using (true);
 
 -- Public can create bookings without login
@@ -170,6 +183,10 @@ drop policy if exists "admin full match_reservations" on public.match_reservatio
 create policy "admin full match_reservations" on public.match_reservations
 for all to authenticated using (true) with check (true);
 
+drop policy if exists "admin full home_logo_images" on public.home_logo_images;
+create policy "admin full home_logo_images" on public.home_logo_images
+for all to authenticated using (true) with check (true);
+
 drop policy if exists "public read site_settings" on public.site_settings;
 create policy "public read site_settings" on public.site_settings
 for select to anon using (true);
@@ -192,6 +209,19 @@ on conflict (id) do update set
   file_size_limit = excluded.file_size_limit,
   allowed_mime_types = excluded.allowed_mime_types;
 
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'game-logos',
+  'game-logos',
+  true,
+  10485760,
+  array['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif']
+)
+on conflict (id) do update set
+  public = excluded.public,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
+
 drop policy if exists "public read home videos" on storage.objects;
 create policy "public read home videos" on storage.objects
 for select to anon using (bucket_id = 'home-videos');
@@ -207,4 +237,20 @@ for update to authenticated using (bucket_id = 'home-videos') with check (bucket
 drop policy if exists "admin delete home videos" on storage.objects;
 create policy "admin delete home videos" on storage.objects
 for delete to authenticated using (bucket_id = 'home-videos');
+
+drop policy if exists "public read game logos" on storage.objects;
+create policy "public read game logos" on storage.objects
+for select to anon using (bucket_id = 'game-logos');
+
+drop policy if exists "admin upload game logos" on storage.objects;
+create policy "admin upload game logos" on storage.objects
+for insert to authenticated with check (bucket_id = 'game-logos');
+
+drop policy if exists "admin update game logos" on storage.objects;
+create policy "admin update game logos" on storage.objects
+for update to authenticated using (bucket_id = 'game-logos') with check (bucket_id = 'game-logos');
+
+drop policy if exists "admin delete game logos" on storage.objects;
+create policy "admin delete game logos" on storage.objects
+for delete to authenticated using (bucket_id = 'game-logos');
 

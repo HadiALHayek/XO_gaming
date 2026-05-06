@@ -1,5 +1,6 @@
 import { HomeVideoManager } from "@/components/admin/HomeVideoManager";
-import { getSiteSettings } from "@/lib/supabase/data";
+import { HomeLogoManager } from "@/components/admin/HomeLogoManager";
+import { getSiteSettings, listHomeLogoImages } from "@/lib/supabase/data";
 
 export const dynamic = "force-dynamic";
 
@@ -8,7 +9,10 @@ export const metadata = {
 };
 
 export default async function AdminMediaPage() {
-  const settings = await getSiteSettings().catch(() => null);
+  const [settings, logos] = await Promise.all([
+    getSiteSettings().catch(() => null),
+    listHomeLogoImages().catch(() => []),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -23,6 +27,7 @@ export default async function AdminMediaPage() {
         currentUrl={settings?.home_video_url ?? null}
         currentPath={settings?.home_video_path ?? null}
       />
+      <HomeLogoManager logos={logos} />
     </div>
   );
 }

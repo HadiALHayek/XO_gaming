@@ -47,6 +47,13 @@ export type SiteSettings = {
   updated_at: string;
 };
 
+export type HomeLogoImage = {
+  id: string;
+  image_path: string;
+  image_url: string;
+  created_at: string;
+};
+
 export type Match = {
   id: string;
   title: string;
