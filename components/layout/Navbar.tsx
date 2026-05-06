@@ -9,7 +9,7 @@ export async function Navbar() {
   const [user, { t }] = await Promise.all([getAdminUser(), getDictionary()]);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-white/5 bg-background/60 backdrop-blur-xl">
+    <header className="w-full border-b border-white/5 bg-background/60 backdrop-blur-xl">
       <div className="container flex h-16 items-center justify-between">
         <Link
           href="/"
