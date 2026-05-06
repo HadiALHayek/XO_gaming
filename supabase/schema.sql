@@ -188,6 +188,10 @@ drop policy if exists "public insert download_requests" on public.download_reque
 create policy "public insert download_requests" on public.download_requests
 for insert to anon with check (true);
 
+drop policy if exists "public read download_requests" on public.download_requests;
+create policy "public read download_requests" on public.download_requests
+for select to anon using (true);
+
 drop policy if exists "public read home_logo_images" on public.home_logo_images;
 create policy "public read home_logo_images" on public.home_logo_images
 for select to anon using (true);

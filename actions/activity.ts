@@ -63,14 +63,19 @@ export async function getUserActivity(input: {
     matchQuery.order("created_at", { ascending: false }).limit(20),
   ]);
 
-  if (reservationsError) return { ok: false, error: reservationsError.message };
-  if (downloadsError) return { ok: false, error: downloadsError.message };
-  if (matchesError) return { ok: false, error: matchesError.message };
+  if (reservationsError && downloadsError && matchesError) {
+    return {
+      ok: false,
+      error: [reservationsError.message, downloadsError.message, matchesError.message]
+        .filter(Boolean)
+        .join(" | "),
+    };
+  }
 
   return {
     ok: true,
     data: {
-      reservations: (reservations ?? []).map((row) => ({
+      reservations: ((reservationsError ? [] : reservations) ?? []).map((row) => ({
         id: row.id as string,
         device_name: Array.isArray(row.device)
           ? ((row.device[0] as { name?: string } | undefined)?.name ?? "Unknown")
@@ -79,14 +84,14 @@ export async function getUserActivity(input: {
         end_time: row.end_time as string,
         created_at: row.created_at as string,
       })),
-      downloadRequests: (downloads ?? []).map((row) => ({
+      downloadRequests: ((downloadsError ? [] : downloads) ?? []).map((row) => ({
         id: row.id as string,
         category: row.category as string,
         status: row.status as string,
         file_name: row.file_name as string,
         created_at: row.created_at as string,
       })),
-      matchReservations: (matches ?? []).map((row) => ({
+      matchReservations: ((matchesError ? [] : matches) ?? []).map((row) => ({
         id: row.id as string,
         match_title: Array.isArray(row.match)
           ? ((row.match[0] as { title?: string } | undefined)?.title ?? "Unknown match")
