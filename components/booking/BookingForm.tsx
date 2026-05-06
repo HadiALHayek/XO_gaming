@@ -28,6 +28,12 @@ function getPcNumber(deviceName: string) {
   return match ? Number(match[1]) : null;
 }
 
+function sortByPcNumber(a: Device, b: Device) {
+  const aNum = getPcNumber(a.name) ?? Number.MAX_SAFE_INTEGER;
+  const bNum = getPcNumber(b.name) ?? Number.MAX_SAFE_INTEGER;
+  return aNum - bNum;
+}
+
 export function BookingForm({ devices }: Props) {
   const { t } = useI18n();
   const [isPending, startTransition] = useTransition();
@@ -124,11 +130,11 @@ export function BookingForm({ devices }: Props) {
   const pcLeftSide = devices.filter((d) => {
     const n = getPcNumber(d.name);
     return n !== null && n >= 1 && n <= 5;
-  });
+  }).sort(sortByPcNumber);
   const pcRightSide = devices.filter((d) => {
     const n = getPcNumber(d.name);
     return n !== null && n > 5;
-  });
+  }).sort(sortByPcNumber);
   const otherDevices = devices.filter((d) => getPcNumber(d.name) === null);
 
   const toggleDevice = (deviceId: string) => {
