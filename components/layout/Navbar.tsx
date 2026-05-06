@@ -68,6 +68,40 @@ export async function Navbar() {
           </Button>
         </div>
       </div>
+      <div className="container pb-3 md:hidden">
+        <nav className="flex flex-wrap items-center gap-3 text-xs">
+          <Link
+            href="/"
+            className="rounded-full border border-white/10 px-3 py-1 text-muted-foreground transition-colors hover:text-foreground"
+          >
+            {t.nav.home}
+          </Link>
+          <Link
+            href="/book"
+            className="rounded-full border border-white/10 px-3 py-1 text-muted-foreground transition-colors hover:text-foreground"
+          >
+            {t.nav.book}
+          </Link>
+          <Link
+            href="/matches"
+            className="rounded-full border border-white/10 px-3 py-1 text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Matches
+          </Link>
+          <Link
+            href="/downloads"
+            className="rounded-full border border-white/10 px-3 py-1 text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Downloads
+          </Link>
+          <Link
+            href={user ? "/admin" : "/admin/login"}
+            className="rounded-full border border-white/10 px-3 py-1 text-muted-foreground transition-colors hover:text-foreground"
+          >
+            {t.nav.admin}
+          </Link>
+        </nav>
+      </div>
     </header>
   );
 }
