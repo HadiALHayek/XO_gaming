@@ -83,8 +83,8 @@ export function BookingForm({ devices }: Props) {
 
   useEffect(() => {
     const loadPrevious = async () => {
-      getOrCreateGuestToken();
-      const result = await getUserActivity();
+      const guestToken = getOrCreateGuestToken();
+      const result = await getUserActivity({ guestToken });
       if (!result.ok) return;
       setPreviousReservations(result.data.reservations.slice(0, 5));
     };
@@ -106,10 +106,11 @@ export function BookingForm({ devices }: Props) {
 
   const onSubmit = form.handleSubmit((values) => {
     startTransition(async () => {
+      const guestToken = getOrCreateGuestToken();
       const startIso = new Date(values.startTime).toISOString();
       const result = await createReservation({
         ...values,
-        guestToken: getOrCreateGuestToken(),
+        guestToken,
         startTime: startIso,
       });
       if (!result.ok) {
@@ -127,7 +128,7 @@ export function BookingForm({ devices }: Props) {
       toast.success(t.book.reservationConfirmed, {
         description: t.book.seeYouSoon,
       });
-      const activity = await getUserActivity();
+      const activity = await getUserActivity({ guestToken });
       if (activity.ok) {
         setPreviousReservations(activity.data.reservations.slice(0, 5));
       }
@@ -189,7 +190,7 @@ export function BookingForm({ devices }: Props) {
               <Label>{t.book.device}</Label>
               <div className="grid gap-4 lg:grid-cols-2">
                 <div className="space-y-2">
-                  <p className="text-xs text-muted-foreground">Left side (PC-1 to PC-5)</p>
+                  <p className="text-xs text-muted-foreground">{t.common.leftSidePcs}</p>
                   <div className="grid gap-2">
                     {pcLeftSide.map((device) => {
                       const checked = deviceIds.includes(device.id);
@@ -213,7 +214,7 @@ export function BookingForm({ devices }: Props) {
                           </div>
                           {!device.is_active ? (
                             <div className="text-xs text-muted-foreground">
-                              maintenance
+                              {t.common.maintenance}
                             </div>
                           ) : null}
                         </button>
@@ -222,7 +223,7 @@ export function BookingForm({ devices }: Props) {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-xs text-muted-foreground">Right side (PC-6+)</p>
+                  <p className="text-xs text-muted-foreground">{t.common.rightSidePcs}</p>
                   <div className="grid gap-2">
                     {pcRightSide.map((device) => {
                       const checked = deviceIds.includes(device.id);
@@ -246,7 +247,7 @@ export function BookingForm({ devices }: Props) {
                           </div>
                           {!device.is_active ? (
                             <div className="text-xs text-muted-foreground">
-                              maintenance
+                              {t.common.maintenance}
                             </div>
                           ) : null}
                         </button>
@@ -257,7 +258,7 @@ export function BookingForm({ devices }: Props) {
               </div>
               {otherDevices.length > 0 ? (
                 <div className="mt-3 space-y-2">
-                  <p className="text-xs text-muted-foreground">Other devices</p>
+                  <p className="text-xs text-muted-foreground">{t.common.otherDevices}</p>
                   <div className="grid gap-2 sm:grid-cols-2">
                     {otherDevices.map((device) => {
                       const checked = deviceIds.includes(device.id);
@@ -281,7 +282,7 @@ export function BookingForm({ devices }: Props) {
                           </div>
                           {!device.is_active ? (
                             <div className="text-xs text-muted-foreground">
-                              maintenance
+                              {t.common.maintenance}
                             </div>
                           ) : null}
                         </button>
@@ -401,7 +402,7 @@ export function BookingForm({ devices }: Props) {
 
           {previousReservations.length > 0 ? (
             <div className="space-y-2 border-t border-white/10 pt-4">
-              <p className="text-sm font-medium">Previous reservations</p>
+              <p className="text-sm font-medium">{t.common.previousReservations}</p>
               <div className="space-y-2">
                 {previousReservations.map((reservation) => (
                   <div

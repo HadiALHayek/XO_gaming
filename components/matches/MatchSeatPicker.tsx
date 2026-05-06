@@ -23,6 +23,7 @@ import { createMatchSeatReservation } from "@/actions/matches";
 import { getUserActivity } from "@/actions/activity";
 import { getOrCreateGuestToken } from "@/lib/guest/client";
 import { formatDateTime } from "@/lib/dates";
+import { useI18n } from "@/components/providers/I18nProvider";
 
 type Props = {
   matchId: string;
@@ -32,6 +33,7 @@ type Props = {
 const ALL_SEATS = Array.from({ length: 20 }, (_, i) => i + 1);
 
 export function MatchSeatPicker({ matchId, reservedSeats }: Props) {
+  const { t } = useI18n();
   const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -57,8 +59,8 @@ export function MatchSeatPicker({ matchId, reservedSeats }: Props) {
 
   useEffect(() => {
     const loadPrevious = async () => {
-      getOrCreateGuestToken();
-      const result = await getUserActivity();
+      const guestToken = getOrCreateGuestToken();
+      const result = await getUserActivity({ guestToken });
       if (!result.ok) return;
       setPreviousMatchReservations(result.data.matchReservations.slice(0, 8));
     };
@@ -74,7 +76,7 @@ export function MatchSeatPicker({ matchId, reservedSeats }: Props) {
 
   const openForm = () => {
     if (selectedSeats.length === 0) {
-      toast.error("Select at least one seat.");
+      toast.error(t.matches.selectAtLeastOneSeat);
       return;
     }
     form.setValue("seats", selectedSeats, { shouldValidate: true });
@@ -83,9 +85,10 @@ export function MatchSeatPicker({ matchId, reservedSeats }: Props) {
 
   const onSubmit = form.handleSubmit((values) => {
     startTransition(async () => {
+      const guestToken = getOrCreateGuestToken();
       const result = await createMatchSeatReservation({
         ...values,
-        guestToken: getOrCreateGuestToken(),
+        guestToken,
         matchId,
         seats: selectedSeats.sort((a, b) => a - b),
       });
@@ -93,8 +96,8 @@ export function MatchSeatPicker({ matchId, reservedSeats }: Props) {
         toast.error(result.error);
         return;
       }
-      toast.success("Seats reserved successfully.");
-      const activity = await getUserActivity();
+      toast.success(t.matches.seatReservationSuccess);
+      const activity = await getUserActivity({ guestToken });
       if (activity.ok) {
         setPreviousMatchReservations(activity.data.matchReservations.slice(0, 8));
       }
@@ -108,7 +111,7 @@ export function MatchSeatPicker({ matchId, reservedSeats }: Props) {
     <div className="space-y-6">
       <div className="space-y-3">
         <div className="mx-auto w-full max-w-md rounded-md border border-neon-cyan/40 bg-neon-cyan/10 p-2 text-center text-sm font-semibold tracking-wide text-neon-cyan">
-          SCREEN
+          {t.matches.screen}
         </div>
         <div className="mx-auto grid max-w-md grid-cols-4 gap-3">
           {ALL_SEATS.map((seat) => {
@@ -138,31 +141,33 @@ export function MatchSeatPicker({ matchId, reservedSeats }: Props) {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
-          Selected seats:{" "}
+          {t.matches.selectedSeats}:{" "}
           <span className="text-foreground">
-            {selectedSeats.length > 0 ? selectedSeats.sort((a, b) => a - b).join(", ") : "None"}
+            {selectedSeats.length > 0
+              ? selectedSeats.sort((a, b) => a - b).join(", ")
+              : t.matches.none}
           </span>
         </p>
         <Button onClick={openForm} disabled={selectedSeats.length === 0}>
-          Reserve selected seats
+          {t.matches.reserveSelectedSeats}
         </Button>
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Complete your reservation</DialogTitle>
+            <DialogTitle>{t.matches.completeReservation}</DialogTitle>
             <DialogDescription>
-              You are reserving seats: {selectedSeats.sort((a, b) => a - b).join(", ")}
+              {t.matches.reservingSeats}: {selectedSeats.sort((a, b) => a - b).join(", ")}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="ms-name">Full name</Label>
+              <Label htmlFor="ms-name">{t.matches.fullName}</Label>
               <Input id="ms-name" {...form.register("customerName")} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="ms-phone">Phone number</Label>
+              <Label htmlFor="ms-phone">{t.matches.phoneNumber}</Label>
               <Input
                 id="ms-phone"
                 placeholder="09XXXXXXXX or +9639XXXXXXXX"
@@ -171,10 +176,10 @@ export function MatchSeatPicker({ matchId, reservedSeats }: Props) {
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                Cancel
+                {t.matches.cancel}
               </Button>
               <Button type="submit" disabled={isPending}>
-                {isPending ? "Saving..." : "Confirm reservation"}
+                {isPending ? t.matches.saving : t.matches.confirmReservation}
               </Button>
             </DialogFooter>
           </form>
@@ -183,14 +188,15 @@ export function MatchSeatPicker({ matchId, reservedSeats }: Props) {
 
       {previousMatchReservations.length > 0 ? (
         <div className="space-y-2 border-t border-white/10 pt-4">
-          <p className="text-sm font-medium">Your previous seat reservations</p>
+          <p className="text-sm font-medium">{t.matches.previousSeatReservations}</p>
           <div className="space-y-2">
             {previousMatchReservations.map((reservation) => (
               <div
                 key={reservation.id}
                 className="rounded-md border border-white/10 bg-white/5 px-3 py-2 text-xs text-muted-foreground"
               >
-                <span className="font-medium text-foreground">{reservation.match_title}</span> - Seat{" "}
+                <span className="font-medium text-foreground">{reservation.match_title}</span> -{" "}
+                {t.matches.seat}{" "}
                 {reservation.seat_number} - {formatDateTime(reservation.created_at)}
               </div>
             ))}

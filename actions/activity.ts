@@ -1,6 +1,5 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type UserActivityResult =
@@ -31,11 +30,12 @@ export type UserActivityResult =
     }
   | { ok: false; error: string };
 
-export async function getUserActivity(): Promise<UserActivityResult> {
-  const cookieStore = await cookies();
-  const guestToken = cookieStore.get("xo_guest_token")?.value?.trim() || null;
+export async function getUserActivity(input: {
+  guestToken?: string;
+}): Promise<UserActivityResult> {
+  const guestToken = input.guestToken?.trim() || null;
   if (!guestToken) {
-    return { ok: false, error: "No saved activity cookie found on this device." };
+    return { ok: false, error: "No saved activity token found on this device." };
   }
 
   const supabase = await createSupabaseServerClient();

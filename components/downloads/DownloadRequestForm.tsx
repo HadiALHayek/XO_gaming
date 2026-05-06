@@ -23,8 +23,10 @@ import { createDownloadRequest } from "@/actions/downloads";
 import { getUserActivity } from "@/actions/activity";
 import { getOrCreateGuestToken } from "@/lib/guest/client";
 import { formatDateTime } from "@/lib/dates";
+import { useI18n } from "@/components/providers/I18nProvider";
 
 export function DownloadRequestForm() {
+  const { t } = useI18n();
   const [isPending, startTransition] = useTransition();
   const [previousRequests, setPreviousRequests] = useState<
     Array<{
@@ -47,8 +49,8 @@ export function DownloadRequestForm() {
 
   useEffect(() => {
     const loadPrevious = async () => {
-      getOrCreateGuestToken();
-      const result = await getUserActivity();
+      const guestToken = getOrCreateGuestToken();
+      const result = await getUserActivity({ guestToken });
       if (!result.ok) return;
       setPreviousRequests(result.data.downloadRequests.slice(0, 5));
     };
@@ -66,8 +68,8 @@ export function DownloadRequestForm() {
         toast.error(result.error);
         return;
       }
-      toast.success("Request sent to admin.");
-      const activity = await getUserActivity();
+      toast.success(t.downloads.requestSent);
+      const activity = await getUserActivity({ guestToken: withGuestToken.guestToken });
       if (activity.ok) {
         setPreviousRequests(activity.data.downloadRequests.slice(0, 5));
       }
@@ -85,7 +87,7 @@ export function DownloadRequestForm() {
       <CardContent className="space-y-4 p-6">
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="d-category">Category</Label>
+            <Label htmlFor="d-category">{t.downloads.category}</Label>
             <Select
               value={form.watch("category")}
               onValueChange={(v) =>
@@ -98,25 +100,25 @@ export function DownloadRequestForm() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="GAMES">Games</SelectItem>
-                <SelectItem value="SERIES">Series</SelectItem>
-                <SelectItem value="FILMS">Films</SelectItem>
+                <SelectItem value="GAMES">{t.downloads.games}</SelectItem>
+                <SelectItem value="SERIES">{t.downloads.series}</SelectItem>
+                <SelectItem value="FILMS">{t.downloads.films}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="d-file">File name</Label>
+            <Label htmlFor="d-file">{t.downloads.fileName}</Label>
             <Input id="d-file" placeholder="e.g. EA FC 25" {...form.register("fileName")} />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="d-name">Your name</Label>
+              <Label htmlFor="d-name">{t.downloads.yourName}</Label>
               <Input id="d-name" placeholder="Your full name" {...form.register("customerName")} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="d-phone">Phone number</Label>
+              <Label htmlFor="d-phone">{t.downloads.phoneNumber}</Label>
               <Input
                 id="d-phone"
                 placeholder="09XXXXXXXX or +9639XXXXXXXX"
@@ -126,13 +128,13 @@ export function DownloadRequestForm() {
           </div>
 
           <Button type="submit" disabled={isPending} className="w-full">
-            {isPending ? "Sending..." : "Send request"}
+            {isPending ? t.downloads.sending : t.downloads.sendRequest}
           </Button>
         </form>
 
         {previousRequests.length > 0 ? (
           <div className="space-y-2 border-t border-white/10 pt-4">
-            <p className="text-sm font-medium">Previous requests</p>
+            <p className="text-sm font-medium">{t.downloads.previousRequests}</p>
             <div className="space-y-2">
               {previousRequests.map((request) => (
                 <div
@@ -140,7 +142,13 @@ export function DownloadRequestForm() {
                   className="rounded-md border border-white/10 bg-white/5 px-3 py-2 text-xs text-muted-foreground"
                 >
                   <span className="font-medium text-foreground">{request.file_name}</span> -{" "}
-                  {request.category} - {request.status} - {formatDateTime(request.created_at)}
+                  {request.category} -{" "}
+                  {request.status === "HOLD"
+                    ? t.common.hold
+                    : request.status === "ON_PROGRESS"
+                      ? t.common.onProgress
+                      : t.common.finished}{" "}
+                  - {formatDateTime(request.created_at)}
                 </div>
               ))}
             </div>

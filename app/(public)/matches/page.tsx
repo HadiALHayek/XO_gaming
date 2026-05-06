@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { listMatches, listMatchReservations } from "@/lib/supabase/data";
 import { formatDateTime } from "@/lib/dates";
+import { getDictionary } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +12,7 @@ export const metadata = {
 };
 
 export default async function MatchesPage() {
-  const matches = await listMatches().catch(() => []);
+  const [{ t }, matches] = await Promise.all([getDictionary(), listMatches().catch(() => [])]);
   const seatCounts = await Promise.all(
     matches.map(async (match) => ({
       id: match.id,
@@ -23,16 +24,14 @@ export default async function MatchesPage() {
   return (
     <div className="container space-y-6 py-12">
       <div>
-        <h1 className="font-display text-3xl font-bold md:text-4xl">Matches reservation</h1>
-        <p className="text-sm text-muted-foreground">
-          Choose a match, then select one or more seats.
-        </p>
+        <h1 className="font-display text-3xl font-bold md:text-4xl">{t.matches.title}</h1>
+        <p className="text-sm text-muted-foreground">{t.matches.subtitle}</p>
       </div>
 
       {matches.length === 0 ? (
         <Card>
           <CardContent className="p-10 text-center text-sm text-muted-foreground">
-            No matches available right now.
+            {t.matches.noMatches}
           </CardContent>
         </Card>
       ) : (
@@ -44,13 +43,13 @@ export default async function MatchesPage() {
                   <h2 className="text-lg font-semibold">{match.title}</h2>
                   <p className="text-xs text-muted-foreground">{formatDateTime(match.match_date)}</p>
                 </div>
-                <p className="text-sm text-muted-foreground">{match.details ?? "No additional details."}</p>
+                <p className="text-sm text-muted-foreground">{match.details ?? t.matches.noDetails}</p>
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-muted-foreground">
-                    Reserved: {countsById[match.id] ?? 0} / 20 seats
+                    {t.matches.reservedCount}: {countsById[match.id] ?? 0} / 20 {t.matches.seats}
                   </p>
                   <Button asChild size="sm">
-                    <Link href={`/matches/${match.id}`}>Select seats</Link>
+                    <Link href={`/matches/${match.id}`}>{t.matches.selectSeats}</Link>
                   </Button>
                 </div>
               </CardContent>

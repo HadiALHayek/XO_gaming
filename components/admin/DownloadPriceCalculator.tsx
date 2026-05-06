@@ -4,8 +4,10 @@ import { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useI18n } from "@/components/providers/I18nProvider";
 
 export function DownloadPriceCalculator() {
+  const { t } = useI18n();
   const [sizeGb, setSizeGb] = useState<string>("0");
 
   const price = useMemo(() => {
@@ -17,14 +19,12 @@ export function DownloadPriceCalculator() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Download Price Calculator</CardTitle>
-        <CardDescription>
-          Price rule: 2 Syrian Pound for each 1 GB downloaded.
-        </CardDescription>
+        <CardTitle>{t.calculator.title}</CardTitle>
+        <CardDescription>{t.calculator.rule}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="space-y-1.5">
-          <Label htmlFor="download-size-gb">Downloaded size (GB)</Label>
+          <Label htmlFor="download-size-gb">{t.calculator.downloadedSize}</Label>
           <Input
             id="download-size-gb"
             type="number"
@@ -35,7 +35,8 @@ export function DownloadPriceCalculator() {
           />
         </div>
         <p className="text-sm text-muted-foreground">
-          Total price: <span className="font-semibold text-foreground">{price.toFixed(2)} SYP</span>
+          {t.calculator.totalPrice}:{" "}
+          <span className="font-semibold text-foreground">{price.toFixed(2)} SYP</span>
         </p>
       </CardContent>
     </Card>
