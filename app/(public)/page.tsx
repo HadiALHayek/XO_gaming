@@ -124,9 +124,9 @@ export default async function HomePage() {
               Watch the latest promo and featured game logos.
             </p>
           </div>
-          <div className="flex flex-col items-start gap-4 lg:flex-row lg:items-stretch">
+          <div className="flex flex-col items-start gap-4 lg:flex-row lg:items-start">
             {settings?.home_video_url ? (
-              <Card className="w-full overflow-hidden lg:w-[640px]">
+              <Card className="w-[280px] overflow-hidden sm:w-[320px]">
                 <CardContent className="p-0">
                   <video
                     src={settings.home_video_url}
@@ -135,7 +135,7 @@ export default async function HomePage() {
                     muted
                     loop
                     playsInline
-                    className="h-[220px] w-full bg-black object-cover sm:h-[260px] lg:h-[320px]"
+                    className="aspect-square w-full bg-black object-cover"
                   />
                 </CardContent>
               </Card>
