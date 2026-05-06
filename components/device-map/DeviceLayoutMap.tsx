@@ -5,11 +5,11 @@ import {
   ArrowRightLeft,
   Building2,
   DoorOpen,
+  Fence,
+  MoveUpRight,
   Martini,
   Route,
   SplitSquareVertical,
-  Staircase,
-  Wall,
 } from "lucide-react";
 import { deviceLayoutFloors } from "@/lib/device-layout/mapConfig";
 import type { Device } from "@/types";
@@ -39,8 +39,8 @@ function decorationIcon(label: string) {
   if (text.includes("entry") || text.includes("door")) return DoorOpen;
   if (text.includes("counter")) return Building2;
   if (text.includes("bar")) return Martini;
-  if (text.includes("stair")) return Staircase;
-  if (text.includes("wall")) return Wall;
+  if (text.includes("stair")) return MoveUpRight;
+  if (text.includes("wall")) return Fence;
   return Route;
 }
 
