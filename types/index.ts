@@ -78,3 +78,14 @@ export type MatchReservation = {
   created_at: string;
 };
 
+export type DownloadRequestCategory = "GAMES" | "SERIES" | "FILMS";
+
+export type DownloadRequest = {
+  id: string;
+  category: DownloadRequestCategory;
+  file_name: string;
+  customer_name: string;
+  customer_phone: string;
+  created_at: string;
+};
+

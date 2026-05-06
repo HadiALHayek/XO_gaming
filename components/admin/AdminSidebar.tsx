@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   CalendarDays,
   Clapperboard,
+  Download,
   Gauge,
   Gamepad2,
   LogOut,
@@ -20,6 +21,7 @@ const links = [
   { href: "/admin", label: "Overview", icon: Gauge, exact: true },
   { href: "/admin/reservations", label: "Reservations", icon: CalendarDays },
   { href: "/admin/matches", label: "Matches", icon: Trophy },
+  { href: "/admin/downloads", label: "Downloads", icon: Download },
   { href: "/admin/devices", label: "Devices", icon: Gamepad2 },
   { href: "/admin/blocked-slots", label: "Maintenance", icon: ShieldAlert },
   { href: "/admin/media", label: "Homepage Media", icon: Clapperboard },

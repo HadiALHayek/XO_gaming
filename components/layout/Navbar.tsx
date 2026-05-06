@@ -43,6 +43,12 @@ export async function Navbar() {
             Matches
           </Link>
           <Link
+            href="/downloads"
+            className="text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Downloads
+          </Link>
+          <Link
             href={user ? "/admin" : "/admin/login"}
             className="text-muted-foreground transition-colors hover:text-foreground"
           >

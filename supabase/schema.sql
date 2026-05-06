@@ -65,6 +65,15 @@ create table if not exists public.match_reservations (
   unique (match_id, seat_number)
 );
 
+create table if not exists public.download_requests (
+  id uuid primary key default gen_random_uuid(),
+  category text not null check (category in ('GAMES', 'SERIES', 'FILMS')),
+  file_name text not null,
+  customer_name text not null,
+  customer_phone text not null,
+  created_at timestamptz not null default now()
+);
+
 -- Blocked slots for maintenance
 create table if not exists public.blocked_slots (
   id uuid primary key default gen_random_uuid(),
@@ -107,6 +116,7 @@ create index if not exists idx_blocked_slots_device_start on public.blocked_slot
 create index if not exists idx_blocked_slots_device_end on public.blocked_slots(device_id, end_time);
 create index if not exists idx_matches_date on public.matches(match_date);
 create index if not exists idx_match_reservations_match on public.match_reservations(match_id);
+create index if not exists idx_download_requests_created_at on public.download_requests(created_at desc);
 create index if not exists idx_home_logo_images_created_at on public.home_logo_images(created_at desc);
 create index if not exists idx_home_drink_images_created_at on public.home_drink_images(created_at desc);
 
@@ -134,6 +144,7 @@ alter table public.blocked_slots enable row level security;
 alter table public.site_settings enable row level security;
 alter table public.matches enable row level security;
 alter table public.match_reservations enable row level security;
+alter table public.download_requests enable row level security;
 alter table public.home_logo_images enable row level security;
 alter table public.home_drink_images enable row level security;
 
@@ -157,6 +168,10 @@ for select to anon using (true);
 drop policy if exists "public read match_reservations" on public.match_reservations;
 create policy "public read match_reservations" on public.match_reservations
 for select to anon using (true);
+
+drop policy if exists "public insert download_requests" on public.download_requests;
+create policy "public insert download_requests" on public.download_requests
+for insert to anon with check (true);
 
 drop policy if exists "public read home_logo_images" on public.home_logo_images;
 create policy "public read home_logo_images" on public.home_logo_images
@@ -194,6 +209,10 @@ for all to authenticated using (true) with check (true);
 
 drop policy if exists "admin full match_reservations" on public.match_reservations;
 create policy "admin full match_reservations" on public.match_reservations
+for all to authenticated using (true) with check (true);
+
+drop policy if exists "admin full download_requests" on public.download_requests;
+create policy "admin full download_requests" on public.download_requests
 for all to authenticated using (true) with check (true);
 
 drop policy if exists "admin full home_logo_images" on public.home_logo_images;
