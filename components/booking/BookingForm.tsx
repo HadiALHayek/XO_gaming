@@ -23,6 +23,11 @@ type Props = {
   devices: Device[];
 };
 
+function getPcNumber(deviceName: string) {
+  const match = /^PC-(\d+)$/i.exec(deviceName.trim());
+  return match ? Number(match[1]) : null;
+}
+
 export function BookingForm({ devices }: Props) {
   const { t } = useI18n();
   const [isPending, startTransition] = useTransition();
@@ -116,6 +121,15 @@ export function BookingForm({ devices }: Props) {
   }
 
   const selectedDevices = devices.filter((d) => deviceIds.includes(d.id));
+  const pcLeftSide = devices.filter((d) => {
+    const n = getPcNumber(d.name);
+    return n !== null && n >= 1 && n <= 5;
+  });
+  const pcRightSide = devices.filter((d) => {
+    const n = getPcNumber(d.name);
+    return n !== null && n > 5;
+  });
+  const otherDevices = devices.filter((d) => getPcNumber(d.name) === null);
 
   const toggleDevice = (deviceId: string) => {
     const current = form.getValues("deviceIds");
@@ -141,8 +155,79 @@ export function BookingForm({ devices }: Props) {
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <Label>{t.book.device}</Label>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {devices.map((device) => {
+              <div className="grid gap-4 lg:grid-cols-2">
+                <div className="space-y-2">
+                  <p className="text-xs text-muted-foreground">Left side (PC-1 to PC-5)</p>
+                  <div className="grid gap-2">
+                    {pcLeftSide.map((device) => {
+                      const checked = deviceIds.includes(device.id);
+                      return (
+                        <button
+                          key={device.id}
+                          type="button"
+                          disabled={!device.is_active}
+                          onClick={() => toggleDevice(device.id)}
+                          className={[
+                            "rounded-md border px-3 py-2 text-left text-sm transition",
+                            !device.is_active
+                              ? "cursor-not-allowed border-white/10 bg-white/5 text-muted-foreground"
+                              : checked
+                                ? "border-neon-purple/50 bg-neon-purple/20"
+                                : "border-white/10 bg-white/5 hover:bg-white/10",
+                          ].join(" ")}
+                        >
+                          <div className="font-medium">
+                            {device.name} - {device.type}
+                          </div>
+                          {!device.is_active ? (
+                            <div className="text-xs text-muted-foreground">
+                              maintenance
+                            </div>
+                          ) : null}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-xs text-muted-foreground">Right side (PC-6+)</p>
+                  <div className="grid gap-2">
+                    {pcRightSide.map((device) => {
+                      const checked = deviceIds.includes(device.id);
+                      return (
+                        <button
+                          key={device.id}
+                          type="button"
+                          disabled={!device.is_active}
+                          onClick={() => toggleDevice(device.id)}
+                          className={[
+                            "rounded-md border px-3 py-2 text-left text-sm transition",
+                            !device.is_active
+                              ? "cursor-not-allowed border-white/10 bg-white/5 text-muted-foreground"
+                              : checked
+                                ? "border-neon-purple/50 bg-neon-purple/20"
+                                : "border-white/10 bg-white/5 hover:bg-white/10",
+                          ].join(" ")}
+                        >
+                          <div className="font-medium">
+                            {device.name} - {device.type}
+                          </div>
+                          {!device.is_active ? (
+                            <div className="text-xs text-muted-foreground">
+                              maintenance
+                            </div>
+                          ) : null}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+              {otherDevices.length > 0 ? (
+                <div className="mt-3 space-y-2">
+                  <p className="text-xs text-muted-foreground">Other devices</p>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {otherDevices.map((device) => {
                   const checked = deviceIds.includes(device.id);
                   return (
                     <button
@@ -169,8 +254,10 @@ export function BookingForm({ devices }: Props) {
                       ) : null}
                     </button>
                   );
-                })}
-              </div>
+                    })}
+                  </div>
+                </div>
+              ) : null}
               {form.formState.errors.deviceIds ? (
                 <p className="text-xs text-red-400">
                   {form.formState.errors.deviceIds.message as string}

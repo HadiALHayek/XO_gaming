@@ -41,6 +41,11 @@ type Props = {
   trigger: ReactNode;
 };
 
+function getPcNumber(deviceName: string) {
+  const match = /^PC-(\d+)$/i.exec(deviceName.trim());
+  return match ? Number(match[1]) : null;
+}
+
 export function ReservationFormDialog({
   devices,
   reservation,
@@ -49,6 +54,15 @@ export function ReservationFormDialog({
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const isEdit = Boolean(reservation);
+  const pcLeftSide = devices.filter((d) => {
+    const n = getPcNumber(d.name);
+    return n !== null && n >= 1 && n <= 5;
+  });
+  const pcRightSide = devices.filter((d) => {
+    const n = getPcNumber(d.name);
+    return n !== null && n > 5;
+  });
+  const otherDevices = devices.filter((d) => getPcNumber(d.name) === null);
 
   const defaults = (() => {
     if (reservation) {
@@ -150,8 +164,72 @@ export function ReservationFormDialog({
                 </SelectContent>
               </Select>
             ) : (
-              <div className="grid gap-2 sm:grid-cols-2">
-                {devices.map((d) => {
+              <div className="space-y-3">
+                <div className="grid gap-4 lg:grid-cols-2">
+                  <div className="space-y-2">
+                    <p className="text-xs text-muted-foreground">Left side (PC-1 to PC-5)</p>
+                    <div className="grid gap-2">
+                      {pcLeftSide.map((d) => {
+                        const selected = form.watch("deviceIds").includes(d.id);
+                        return (
+                          <button
+                            key={d.id}
+                            type="button"
+                            onClick={() => {
+                              const current = form.getValues("deviceIds");
+                              const next = current.includes(d.id)
+                                ? current.filter((id) => id !== d.id)
+                                : [...current, d.id];
+                              form.setValue("deviceIds", next, { shouldValidate: true });
+                            }}
+                            className={[
+                              "rounded-md border px-3 py-2 text-left text-sm transition",
+                              selected
+                                ? "border-neon-purple/50 bg-neon-purple/20"
+                                : "border-white/10 bg-white/5 hover:bg-white/10",
+                            ].join(" ")}
+                          >
+                            {d.name} - {d.type}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-xs text-muted-foreground">Right side (PC-6+)</p>
+                    <div className="grid gap-2">
+                      {pcRightSide.map((d) => {
+                        const selected = form.watch("deviceIds").includes(d.id);
+                        return (
+                          <button
+                            key={d.id}
+                            type="button"
+                            onClick={() => {
+                              const current = form.getValues("deviceIds");
+                              const next = current.includes(d.id)
+                                ? current.filter((id) => id !== d.id)
+                                : [...current, d.id];
+                              form.setValue("deviceIds", next, { shouldValidate: true });
+                            }}
+                            className={[
+                              "rounded-md border px-3 py-2 text-left text-sm transition",
+                              selected
+                                ? "border-neon-purple/50 bg-neon-purple/20"
+                                : "border-white/10 bg-white/5 hover:bg-white/10",
+                            ].join(" ")}
+                          >
+                            {d.name} - {d.type}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+                {otherDevices.length > 0 ? (
+                  <div className="space-y-2">
+                    <p className="text-xs text-muted-foreground">Other devices</p>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {otherDevices.map((d) => {
                   const selected = form.watch("deviceIds").includes(d.id);
                   return (
                     <button
@@ -174,7 +252,10 @@ export function ReservationFormDialog({
                       {d.name} - {d.type}
                     </button>
                   );
-                })}
+                      })}
+                    </div>
+                  </div>
+                ) : null}
               </div>
             )}
             {form.formState.errors.deviceIds ? (
