@@ -34,7 +34,7 @@ export async function GET(request: Request) {
     const events = [
       ...reservations.map((r) => ({
         id: `r-${r.id}`,
-        title: "Reserved",
+        title: r.is_daily_recurring ? "Reserved (daily)" : "Reserved",
         start: r.start_time,
         end: r.end_time,
         type: "RESERVATION" as const,

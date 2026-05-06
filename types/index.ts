@@ -1,4 +1,4 @@
-export type DeviceType = "PC" | "PS5";
+export type DeviceType = "PC" | "PS4";
 
 export type Device = {
   id: string;
@@ -16,6 +16,7 @@ export type Reservation = {
   device_id: string;
   start_time: string;
   end_time: string;
+  is_daily_recurring: boolean;
   notes: string | null;
   created_at: string;
 };

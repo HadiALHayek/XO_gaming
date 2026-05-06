@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Book a session",
-  description: "Reserve gaming PCs and PlayStation 5 stations at XO Gaming.",
+  description: "Reserve gaming PCs and PlayStation 4 stations at XO Gaming.",
 };
 
 export default async function BookPage() {

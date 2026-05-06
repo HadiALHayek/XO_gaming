@@ -48,6 +48,7 @@ export const reservationCreateSchema = z
     deviceId: z.string().min(1, "Select a device"),
     startTime: isoDate,
     durationHours: z.coerce.number().int().min(1).max(12),
+    reservationType: z.enum(["ONE_TIME", "DAILY"]).default("ONE_TIME"),
     notes: z.string().max(500).optional().or(z.literal("")),
   })
   .superRefine((data, ctx) => {

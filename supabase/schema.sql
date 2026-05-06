@@ -2,10 +2,18 @@
 create table if not exists public.devices (
   id uuid primary key default gen_random_uuid(),
   name text not null unique,
-  type text not null check (type in ('PC', 'PS5')),
+  type text not null check (type in ('PC', 'PS4')),
   is_active boolean not null default true,
   created_at timestamptz not null default now()
 );
+
+update public.devices
+set type = 'PS4'
+where type = 'PS5';
+
+update public.devices
+set name = regexp_replace(name, '^PS5-', 'PS4-')
+where name like 'PS5-%';
 
 -- Reservations
 create table if not exists public.reservations (
@@ -16,10 +24,14 @@ create table if not exists public.reservations (
   device_id uuid not null references public.devices(id) on delete cascade,
   start_time timestamptz not null,
   end_time timestamptz not null,
+  is_daily_recurring boolean not null default false,
   notes text,
   created_at timestamptz not null default now(),
   check (end_time > start_time)
 );
+
+alter table public.reservations
+add column if not exists is_daily_recurring boolean not null default false;
 
 -- Blocked slots for maintenance
 create table if not exists public.blocked_slots (
@@ -60,10 +72,10 @@ values
   ('PC-8', 'PC'),
   ('PC-9', 'PC'),
   ('PC-10', 'PC'),
-  ('PS5-1', 'PS5'),
-  ('PS5-2', 'PS5'),
-  ('PS5-3', 'PS5'),
-  ('PS5-4', 'PS5')
+  ('PS4-1', 'PS4'),
+  ('PS4-2', 'PS4'),
+  ('PS4-3', 'PS4'),
+  ('PS4-4', 'PS4')
 on conflict (name) do nothing;
 
 alter table public.devices enable row level security;

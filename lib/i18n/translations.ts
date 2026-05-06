@@ -15,7 +15,7 @@ export const translations = {
       heroLine2: "Power up.",
       heroLine3: "Play at",
       heroDescription:
-        "high-end gaming PCs and PlayStation 5 stations, ready when you are. Pick a device, choose your slot, and we will keep the lights on.",
+        "high-end gaming PCs and PlayStation 4 stations, ready when you are. Pick a device, choose your slot, and we will keep the lights on.",
       ctaBook: "Book a session",
       ctaAvailability: "View availability",
       liveAvailability: "Live availability",
@@ -23,14 +23,14 @@ export const translations = {
       sessions: "1-12 hour sessions",
       availableNow: "Available now",
       gamingPcs: "Gaming PCs",
-      playstation: "PlayStation 5",
+      playstation: "PlayStation 4",
       liveDeviceStatus: "Live device status",
       snapshot:
         "A snapshot of the floor right now. Tap a device to see its schedule.",
       bookSlot: "Book a slot",
       noDevices: "No devices yet",
       noDevicesHint:
-        "Run the database seed to create the 10 PCs and 4 PS5 stations.",
+        "Run the database seed to create the 10 PCs and 4 PS4 stations.",
     },
     book: {
       title: "Book your session",
@@ -77,7 +77,7 @@ export const translations = {
       heroLine2: "ارفع المستوى.",
       heroLine3: "العب في",
       heroDescription:
-        "أجهزة ألعاب PC عالية الأداء وبلايستيشن 5 جاهزة لك. اختر الجهاز والوقت واحجز بسهولة.",
+        "أجهزة ألعاب PC عالية الأداء وبلايستيشن 4 جاهزة لك. اختر الجهاز والوقت واحجز بسهولة.",
       ctaBook: "احجز جلسة",
       ctaAvailability: "عرض التوفر",
       liveAvailability: "توفر مباشر",
@@ -85,12 +85,12 @@ export const translations = {
       sessions: "جلسات من 1 إلى 12 ساعة",
       availableNow: "المتاح الآن",
       gamingPcs: "أجهزة PC",
-      playstation: "بلايستيشن 5",
+      playstation: "بلايستيشن 4",
       liveDeviceStatus: "حالة الأجهزة المباشرة",
       snapshot: "نظرة سريعة على الصالة الآن. اضغط على جهاز لرؤية الجدول.",
       bookSlot: "احجز موعدًا",
       noDevices: "لا توجد أجهزة بعد",
-      noDevicesHint: "شغّل ملف التهيئة لإضافة 10 أجهزة PC و4 أجهزة PS5.",
+      noDevicesHint: "شغّل ملف التهيئة لإضافة 10 أجهزة PC و4 أجهزة PS4.",
     },
     book: {
       title: "احجز جلستك",

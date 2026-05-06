@@ -14,19 +14,19 @@ export const metadata: Metadata = {
     template: "%s | XO Gaming",
   },
   description:
-    "Book gaming PCs and PlayStation 5 sessions at XO Gaming. Live availability, instant confirmation, no payment required.",
+    "Book gaming PCs and PlayStation 4 sessions at XO Gaming. Live availability, instant confirmation, no payment required.",
   applicationName: "XO Gaming",
   keywords: [
     "gaming center",
     "esports",
     "PC reservation",
-    "PlayStation 5 booking",
+    "PlayStation 4 booking",
     "gaming cafe",
   ],
   openGraph: {
     title: "XO Gaming - Gaming Center Reservations",
     description:
-      "Book gaming PCs and PlayStation 5 sessions at XO Gaming. Live availability, instant confirmation.",
+      "Book gaming PCs and PlayStation 4 sessions at XO Gaming. Live availability, instant confirmation.",
     url: siteUrl,
     siteName: "XO Gaming",
     type: "website",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "XO Gaming - Gaming Center Reservations",
     description:
-      "Book gaming PCs and PlayStation 5 sessions at XO Gaming.",
+      "Book gaming PCs and PlayStation 4 sessions at XO Gaming.",
   },
   icons: {
     icon: [

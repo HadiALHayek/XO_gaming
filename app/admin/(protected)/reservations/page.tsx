@@ -88,6 +88,7 @@ export default async function AdminReservationsPage({
                     <th className="px-4 py-3 text-left font-medium">
                       Duration
                     </th>
+                    <th className="px-4 py-3 text-left font-medium">Type</th>
                     <th className="px-4 py-3 text-right font-medium">
                       Actions
                     </th>
@@ -127,6 +128,9 @@ export default async function AdminReservationsPage({
                           reservation.end_time,
                         )}
                         h
+                      </td>
+                      <td className="px-4 py-3">
+                        {reservation.is_daily_recurring ? "Daily repeat" : "One time"}
                       </td>
                       <td className="px-4 py-3">
                         <ReservationActions

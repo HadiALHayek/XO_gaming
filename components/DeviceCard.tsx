@@ -49,7 +49,7 @@ export function DeviceCard({
         <div className="flex flex-1 flex-col">
           <span className="text-sm font-semibold">{name}</span>
           <span className="text-xs text-muted-foreground">
-            {type === "PC" ? "Gaming PC" : "PlayStation 5"}
+            {type === "PC" ? "Gaming PC" : "PlayStation 4"}
           </span>
         </div>
         {inactive ? (

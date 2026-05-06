@@ -1,6 +1,6 @@
 ## XO Gaming - Gaming Center Reservations (No User Login)
 
-Modern reservation platform for 10 PCs and 4 PS5 stations.
+Modern reservation platform for 10 PCs and 4 PS4 stations.
 
 - Customers do not create accounts and do not log in.
 - Booking flow: choose device -> choose date/time -> choose duration -> enter name -> submit.

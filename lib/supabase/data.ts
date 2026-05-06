@@ -8,6 +8,64 @@ import type {
   SiteSettings,
 } from "@/types";
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function expandDailyReservationInRange(
+  reservation: Reservation,
+  startIso: string,
+  endIso: string,
+): Reservation[] {
+  if (!reservation.is_daily_recurring) return [reservation];
+
+  const baseStart = new Date(reservation.start_time).getTime();
+  const baseEnd = new Date(reservation.end_time).getTime();
+  const rangeStart = new Date(startIso).getTime();
+  const rangeEnd = new Date(endIso).getTime();
+  const duration = baseEnd - baseStart;
+
+  if (
+    Number.isNaN(baseStart) ||
+    Number.isNaN(baseEnd) ||
+    Number.isNaN(rangeStart) ||
+    Number.isNaN(rangeEnd) ||
+    duration <= 0
+  ) {
+    return [];
+  }
+
+  const baseStartDate = new Date(baseStart);
+  const rangeStartDate = new Date(rangeStart);
+  let current = Date.UTC(
+    rangeStartDate.getUTCFullYear(),
+    rangeStartDate.getUTCMonth(),
+    rangeStartDate.getUTCDate(),
+    baseStartDate.getUTCHours(),
+    baseStartDate.getUTCMinutes(),
+    baseStartDate.getUTCSeconds(),
+    baseStartDate.getUTCMilliseconds(),
+  );
+
+  while (current < baseStart) current += DAY_MS;
+  while (current + duration <= rangeStart) current += DAY_MS;
+
+  const occurrences: Reservation[] = [];
+  while (current < rangeEnd) {
+    const occurrenceEnd = current + duration;
+    if (occurrenceEnd > rangeStart) {
+      const dayKey = new Date(current).toISOString().slice(0, 10);
+      occurrences.push({
+        ...reservation,
+        id: `${reservation.id}-${dayKey}`,
+        start_time: new Date(current).toISOString(),
+        end_time: new Date(occurrenceEnd).toISOString(),
+      });
+    }
+    current += DAY_MS;
+  }
+
+  return occurrences;
+}
+
 export async function listDevices(): Promise<Device[]> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
@@ -37,15 +95,33 @@ export async function listReservationsByRange(
   endIso: string,
 ): Promise<Reservation[]> {
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
-    .from("reservations")
-    .select("*")
-    .eq("device_id", deviceId)
-    .lt("start_time", endIso)
-    .gt("end_time", startIso)
-    .order("start_time", { ascending: true });
-  if (error) throw new Error(error.message);
-  return data ?? [];
+  const [{ data: oneTimeData, error: oneTimeError }, { data: recurringData, error: recurringError }] = await Promise.all([
+    supabase
+      .from("reservations")
+      .select("*")
+      .eq("device_id", deviceId)
+      .eq("is_daily_recurring", false)
+      .lt("start_time", endIso)
+      .gt("end_time", startIso)
+      .order("start_time", { ascending: true }),
+    supabase
+      .from("reservations")
+      .select("*")
+      .eq("device_id", deviceId)
+      .eq("is_daily_recurring", true)
+      .lt("start_time", endIso)
+      .order("start_time", { ascending: true }),
+  ]);
+  if (oneTimeError) throw new Error(oneTimeError.message);
+  if (recurringError) throw new Error(recurringError.message);
+
+  const oneTime = oneTimeData ?? [];
+  const recurringExpanded = (recurringData ?? []).flatMap((reservation) =>
+    expandDailyReservationInRange(reservation as Reservation, startIso, endIso),
+  );
+  return [...oneTime, ...recurringExpanded].sort((a, b) =>
+    a.start_time.localeCompare(b.start_time),
+  );
 }
 
 export async function listBlockedSlotsByRange(

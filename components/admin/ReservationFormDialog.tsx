@@ -66,6 +66,7 @@ export function ReservationFormDialog({
               3600000,
           ),
         ),
+        reservationType: reservation.is_daily_recurring ? "DAILY" : "ONE_TIME",
         notes: reservation.notes ?? "",
       } satisfies ReservationCreateInput;
     }
@@ -84,6 +85,7 @@ export function ReservationFormDialog({
         1,
         Math.round((end.getTime() - start.getTime()) / 3600000),
       ),
+      reservationType: "ONE_TIME",
       notes: "",
     } satisfies ReservationCreateInput;
   })();
@@ -170,6 +172,25 @@ export function ReservationFormDialog({
                   {form.formState.errors.durationHours.message}
                 </p>
               ) : null}
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="r-type">Reservation type</Label>
+              <Select
+                value={form.watch("reservationType")}
+                onValueChange={(v) =>
+                  form.setValue("reservationType", v as "ONE_TIME" | "DAILY", {
+                    shouldValidate: true,
+                  })
+                }
+              >
+                <SelectTrigger id="r-type">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ONE_TIME">One time</SelectItem>
+                  <SelectItem value="DAILY">Daily auto-repeat</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">

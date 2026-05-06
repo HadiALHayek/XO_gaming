@@ -26,7 +26,9 @@ export async function createReservation(input: ReservationCreateInput): Promise<
   const end = new Date(start.getTime() + parsed.data.durationHours * 60 * 60 * 1000);
   const normalizedPhone = normalizeSyrianPhone(parsed.data.customerPhone);
   if (!normalizedPhone) return { ok: false, error: "Invalid phone format." };
-  const availability = await checkAvailability(parsed.data.deviceId, start, end);
+  const availability = await checkAvailability(parsed.data.deviceId, start, end, {
+    repeatDaily: parsed.data.reservationType === "DAILY",
+  });
   if (!availability.ok) return { ok: false, error: availability.message };
 
   const supabase = await createSupabaseServerClient();
@@ -39,6 +41,7 @@ export async function createReservation(input: ReservationCreateInput): Promise<
       device_id: parsed.data.deviceId,
       start_time: start.toISOString(),
       end_time: end.toISOString(),
+      is_daily_recurring: parsed.data.reservationType === "DAILY",
       notes: parsed.data.notes?.trim() || null,
     })
     .select("id")
@@ -62,27 +65,13 @@ export async function updateReservation(input: ReservationUpdateInput): Promise<
   const normalizedPhone = normalizeSyrianPhone(parsed.data.customerPhone);
   if (!normalizedPhone) return { ok: false, error: "Invalid phone format." };
 
-  const supabase = await createSupabaseServerClient();
-  const [{ data: existingRows, error: existingError }, { data: blockedRows, error: blockedError }] = await Promise.all([
-    supabase
-      .from("reservations")
-      .select("id,start_time,end_time")
-      .eq("device_id", parsed.data.deviceId)
-      .neq("id", parsed.data.id)
-      .lt("start_time", end.toISOString())
-      .gt("end_time", start.toISOString()),
-    supabase
-      .from("blocked_slots")
-      .select("id,start_time,end_time")
-      .eq("device_id", parsed.data.deviceId)
-      .lt("start_time", end.toISOString())
-      .gt("end_time", start.toISOString()),
-  ]);
-  if (existingError) return { ok: false, error: existingError.message };
-  if (blockedError) return { ok: false, error: blockedError.message };
-  if ((existingRows ?? []).length > 0) return { ok: false, error: "Time overlaps an existing reservation." };
-  if ((blockedRows ?? []).length > 0) return { ok: false, error: "Selected time is blocked for maintenance." };
+  const availability = await checkAvailability(parsed.data.deviceId, start, end, {
+    repeatDaily: parsed.data.reservationType === "DAILY",
+    excludeReservationId: parsed.data.id,
+  });
+  if (!availability.ok) return { ok: false, error: availability.message };
 
+  const supabase = await createSupabaseServerClient();
   const { error } = await supabase
     .from("reservations")
     .update({
@@ -92,6 +81,7 @@ export async function updateReservation(input: ReservationUpdateInput): Promise<
       device_id: parsed.data.deviceId,
       start_time: start.toISOString(),
       end_time: end.toISOString(),
+      is_daily_recurring: parsed.data.reservationType === "DAILY",
       notes: parsed.data.notes?.trim() || null,
     })
     .eq("id", parsed.data.id);

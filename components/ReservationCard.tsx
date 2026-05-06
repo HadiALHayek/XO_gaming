@@ -19,6 +19,7 @@ export function ReservationCard({
             </div>
             <div className="mt-1 text-xs text-muted-foreground">
               {reservation.device.name} - {reservation.device.type}
+              {reservation.is_daily_recurring ? " - Daily repeat" : ""}
             </div>
           </div>
         </div>

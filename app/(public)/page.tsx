@@ -17,7 +17,7 @@ export default async function HomePage() {
   ]);
 
   const pcCount = devices.filter((d) => d.type === "PC").length;
-  const ps5Count = devices.filter((d) => d.type === "PS5").length;
+  const ps4Count = devices.filter((d) => d.type === "PS4").length;
   const availableNow = devices.filter((d) => d.is_active && !d.busyNow).length;
 
   return (
@@ -36,7 +36,7 @@ export default async function HomePage() {
               {t.home.heroLine3} <span className="gradient-text">{t.brand}.</span>
             </h1>
             <p className="max-w-xl text-base text-muted-foreground md:text-lg">
-              {pcCount} {t.home.gamingPcs.toLowerCase()} + {ps5Count} {t.home.playstation}. {t.home.heroDescription}
+              {pcCount} {t.home.gamingPcs.toLowerCase()} + {ps4Count} {t.home.playstation}. {t.home.heroDescription}
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <Button asChild size="xl">
@@ -100,7 +100,7 @@ export default async function HomePage() {
                     {t.home.playstation}
                   </div>
                   <div className="font-display text-3xl font-bold">
-                    {ps5Count}
+                    {ps4Count}
                   </div>
                   <div className="text-xs text-muted-foreground">
                     4K HDR ready
