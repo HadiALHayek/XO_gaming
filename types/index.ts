@@ -47,3 +47,20 @@ export type SiteSettings = {
   updated_at: string;
 };
 
+export type Match = {
+  id: string;
+  title: string;
+  match_date: string;
+  details: string | null;
+  created_at: string;
+};
+
+export type MatchReservation = {
+  id: string;
+  match_id: string;
+  seat_number: number;
+  customer_name: string;
+  customer_phone: string;
+  created_at: string;
+};
+

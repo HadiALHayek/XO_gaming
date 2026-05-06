@@ -8,6 +8,7 @@ import {
   Gauge,
   Gamepad2,
   LogOut,
+  Trophy,
   ShieldAlert,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 const links = [
   { href: "/admin", label: "Overview", icon: Gauge, exact: true },
   { href: "/admin/reservations", label: "Reservations", icon: CalendarDays },
+  { href: "/admin/matches", label: "Matches", icon: Trophy },
   { href: "/admin/devices", label: "Devices", icon: Gamepad2 },
   { href: "/admin/blocked-slots", label: "Maintenance", icon: ShieldAlert },
   { href: "/admin/media", label: "Homepage Media", icon: Clapperboard },

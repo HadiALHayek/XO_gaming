@@ -37,6 +37,12 @@ export async function Navbar() {
             {t.nav.book}
           </Link>
           <Link
+            href="/matches"
+            className="text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Matches
+          </Link>
+          <Link
             href={user ? "/admin" : "/admin/login"}
             className="text-muted-foreground transition-colors hover:text-foreground"
           >

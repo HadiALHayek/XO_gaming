@@ -7,6 +7,12 @@ create table if not exists public.devices (
   created_at timestamptz not null default now()
 );
 
+alter table public.devices
+drop constraint if exists devices_type_check;
+
+alter table public.devices
+add constraint devices_type_check check (type in ('PC', 'PS4', 'PS5'));
+
 update public.devices
 set type = 'PS4'
 where type = 'PS5';
@@ -14,6 +20,12 @@ where type = 'PS5';
 update public.devices
 set name = regexp_replace(name, '^PS5-', 'PS4-')
 where name like 'PS5-%';
+
+alter table public.devices
+drop constraint if exists devices_type_check;
+
+alter table public.devices
+add constraint devices_type_check check (type in ('PC', 'PS4'));
 
 -- Reservations
 create table if not exists public.reservations (
@@ -32,6 +44,26 @@ create table if not exists public.reservations (
 
 alter table public.reservations
 add column if not exists is_daily_recurring boolean not null default false;
+
+-- Matches
+create table if not exists public.matches (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  match_date timestamptz not null,
+  details text,
+  created_at timestamptz not null default now()
+);
+
+-- Seats reserved for matches
+create table if not exists public.match_reservations (
+  id uuid primary key default gen_random_uuid(),
+  match_id uuid not null references public.matches(id) on delete cascade,
+  seat_number integer not null check (seat_number between 1 and 20),
+  customer_name text not null,
+  customer_phone text not null,
+  created_at timestamptz not null default now(),
+  unique (match_id, seat_number)
+);
 
 -- Blocked slots for maintenance
 create table if not exists public.blocked_slots (
@@ -59,6 +91,8 @@ create index if not exists idx_reservations_device_start on public.reservations(
 create index if not exists idx_reservations_device_end on public.reservations(device_id, end_time);
 create index if not exists idx_blocked_slots_device_start on public.blocked_slots(device_id, start_time);
 create index if not exists idx_blocked_slots_device_end on public.blocked_slots(device_id, end_time);
+create index if not exists idx_matches_date on public.matches(match_date);
+create index if not exists idx_match_reservations_match on public.match_reservations(match_id);
 
 insert into public.devices (name, type)
 values
@@ -82,6 +116,8 @@ alter table public.devices enable row level security;
 alter table public.reservations enable row level security;
 alter table public.blocked_slots enable row level security;
 alter table public.site_settings enable row level security;
+alter table public.matches enable row level security;
+alter table public.match_reservations enable row level security;
 
 -- Public read access (for live availability)
 drop policy if exists "public read devices" on public.devices;
@@ -96,9 +132,21 @@ drop policy if exists "public read blocked_slots" on public.blocked_slots;
 create policy "public read blocked_slots" on public.blocked_slots
 for select to anon using (true);
 
+drop policy if exists "public read matches" on public.matches;
+create policy "public read matches" on public.matches
+for select to anon using (true);
+
+drop policy if exists "public read match_reservations" on public.match_reservations;
+create policy "public read match_reservations" on public.match_reservations
+for select to anon using (true);
+
 -- Public can create bookings without login
 drop policy if exists "public insert reservations" on public.reservations;
 create policy "public insert reservations" on public.reservations
+for insert to anon with check (true);
+
+drop policy if exists "public insert match_reservations" on public.match_reservations;
+create policy "public insert match_reservations" on public.match_reservations
 for insert to anon with check (true);
 
 -- Admin-only write access
@@ -112,6 +160,14 @@ for all to authenticated using (true) with check (true);
 
 drop policy if exists "admin full blocked_slots" on public.blocked_slots;
 create policy "admin full blocked_slots" on public.blocked_slots
+for all to authenticated using (true) with check (true);
+
+drop policy if exists "admin full matches" on public.matches;
+create policy "admin full matches" on public.matches
+for all to authenticated using (true) with check (true);
+
+drop policy if exists "admin full match_reservations" on public.match_reservations;
+create policy "admin full match_reservations" on public.match_reservations
 for all to authenticated using (true) with check (true);
 
 drop policy if exists "public read site_settings" on public.site_settings;

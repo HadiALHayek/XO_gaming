@@ -90,7 +90,7 @@ export default async function HomePage() {
                   </div>
                   <div className="font-display text-3xl font-bold">{pcCount}</div>
                   <div className="text-xs text-muted-foreground">
-                    RTX-class rigs
+                    Play Online
                   </div>
                 </CardContent>
               </Card>
@@ -103,7 +103,7 @@ export default async function HomePage() {
                     {ps4Count}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    4K HDR ready
+                    Challenge ready
                   </div>
                 </CardContent>
               </Card>

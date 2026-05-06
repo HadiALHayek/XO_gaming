@@ -3,6 +3,8 @@ import type {
   BlockedSlot,
   BlockedSlotWithDevice,
   Device,
+  Match,
+  MatchReservation,
   Reservation,
   ReservationWithDevice,
   SiteSettings,
@@ -176,5 +178,37 @@ export async function getSiteSettings(): Promise<SiteSettings | null> {
     .maybeSingle();
   if (error) throw new Error(error.message);
   return (data as SiteSettings | null) ?? null;
+}
+
+export async function listMatches(): Promise<Match[]> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("matches")
+    .select("*")
+    .order("match_date", { ascending: true });
+  if (error) throw new Error(error.message);
+  return (data as Match[]) ?? [];
+}
+
+export async function getMatchById(matchId: string): Promise<Match | null> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("matches")
+    .select("*")
+    .eq("id", matchId)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return (data as Match | null) ?? null;
+}
+
+export async function listMatchReservations(matchId: string): Promise<MatchReservation[]> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("match_reservations")
+    .select("*")
+    .eq("match_id", matchId)
+    .order("seat_number", { ascending: true });
+  if (error) throw new Error(error.message);
+  return (data as MatchReservation[]) ?? [];
 }
 
