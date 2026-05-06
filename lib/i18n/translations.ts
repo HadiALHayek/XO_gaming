@@ -6,7 +6,15 @@ export const localeCookieName = "xo_locale";
 export const translations = {
   en: {
     brand: "XO Gaming",
-    nav: { home: "Home", book: "Book", admin: "Admin", bookNow: "Book Now" },
+    nav: {
+      home: "Home",
+      book: "Book",
+      matches: "Matches",
+      downloads: "Downloads",
+      myActivity: "My activity",
+      admin: "Admin",
+      bookNow: "Book Now",
+    },
     language: { english: "English", arabic: "العربية" },
     footer: { rights: "All rights reserved." },
     home: {
@@ -65,10 +73,47 @@ export const translations = {
       restricted: "Restricted area for XO Gaming staff.",
       overviewHint: "What is happening at XO Gaming right now.",
     },
+    downloads: {
+      title: "Download Requests",
+      subtitle:
+        "Request games, series, or films. Add file name, your name, and phone number.",
+      category: "Category",
+      games: "Games",
+      series: "Series",
+      films: "Films",
+      fileName: "File name",
+      yourName: "Your name",
+      sendRequest: "Send request",
+      statusHold: "Hold",
+      statusOnProgress: "On progress",
+      statusFinished: "Finished",
+    },
+    activity: {
+      title: "My Activity",
+      subtitle:
+        "View your reservations and requests without account login. Works automatically on this device, and also by phone number.",
+      findByPhone: "Find with phone number (optional)",
+      loadActivity: "Load my activity",
+      useDeviceHistory: "Use this device history",
+      reservations: "Reservations",
+      downloadRequests: "Download requests",
+      matchReservations: "Match reservations",
+      noReservations: "No reservations found.",
+      noDownloads: "No download requests found.",
+      noMatches: "No match reservations found.",
+    },
   },
   ar: {
     brand: "XO Gaming",
-    nav: { home: "الرئيسية", book: "الحجز", admin: "الإدارة", bookNow: "احجز الآن" },
+    nav: {
+      home: "الرئيسية",
+      book: "الحجز",
+      matches: "المباريات",
+      downloads: "التحميلات",
+      myActivity: "نشاطي",
+      admin: "الإدارة",
+      bookNow: "احجز الآن",
+    },
     language: { english: "English", arabic: "العربية" },
     footer: { rights: "جميع الحقوق محفوظة." },
     home: {
@@ -124,6 +169,35 @@ export const translations = {
     admin: {
       restricted: "منطقة مخصصة لموظفي XO Gaming فقط.",
       overviewHint: "ما الذي يحدث الآن في XO Gaming.",
+    },
+    downloads: {
+      title: "طلبات التحميل",
+      subtitle:
+        "اطلب ألعابًا أو مسلسلات أو أفلامًا، وأضف اسم الملف واسمك ورقم هاتفك.",
+      category: "الفئة",
+      games: "ألعاب",
+      series: "مسلسلات",
+      films: "أفلام",
+      fileName: "اسم الملف",
+      yourName: "اسمك",
+      sendRequest: "إرسال الطلب",
+      statusHold: "قيد الانتظار",
+      statusOnProgress: "قيد التنفيذ",
+      statusFinished: "منتهي",
+    },
+    activity: {
+      title: "نشاطي",
+      subtitle:
+        "اعرض حجوزاتك وطلباتك بدون تسجيل دخول. يعمل تلقائيًا على هذا الجهاز ويمكن البحث أيضًا عبر رقم الهاتف.",
+      findByPhone: "البحث برقم الهاتف (اختياري)",
+      loadActivity: "عرض نشاطي",
+      useDeviceHistory: "استخدام سجل هذا الجهاز",
+      reservations: "الحجوزات",
+      downloadRequests: "طلبات التحميل",
+      matchReservations: "حجوزات المباريات",
+      noReservations: "لا توجد حجوزات.",
+      noDownloads: "لا توجد طلبات تحميل.",
+      noMatches: "لا توجد حجوزات مباريات.",
     },
   },
 } as const;

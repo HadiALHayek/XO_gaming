@@ -76,6 +76,7 @@ export async function createMatchSeatReservation(
       seat_number: seatNumber,
       customer_name: parsed.data.customerName.trim(),
       customer_phone: normalizedPhone,
+      guest_token: parsed.data.guestToken?.trim() || null,
     })),
   );
 

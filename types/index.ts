@@ -13,6 +13,7 @@ export type Reservation = {
   customer_name: string;
   customer_phone: string | null;
   customer_discord: string | null;
+  guest_token: string | null;
   device_id: string;
   start_time: string;
   end_time: string;
@@ -75,17 +76,21 @@ export type MatchReservation = {
   seat_number: number;
   customer_name: string;
   customer_phone: string;
+  guest_token: string | null;
   created_at: string;
 };
 
 export type DownloadRequestCategory = "GAMES" | "SERIES" | "FILMS";
+export type DownloadRequestStatus = "HOLD" | "ON_PROGRESS" | "FINISHED";
 
 export type DownloadRequest = {
   id: string;
   category: DownloadRequestCategory;
+  status: DownloadRequestStatus;
   file_name: string;
   customer_name: string;
   customer_phone: string;
+  guest_token: string | null;
   created_at: string;
 };
 

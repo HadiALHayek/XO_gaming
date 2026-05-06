@@ -20,6 +20,7 @@ import {
   type MatchSeatReservationInput,
 } from "@/lib/matches/schemas";
 import { createMatchSeatReservation } from "@/actions/matches";
+import { getOrCreateGuestToken } from "@/lib/guest/client";
 
 type Props = {
   matchId: string;
@@ -64,6 +65,7 @@ export function MatchSeatPicker({ matchId, reservedSeats }: Props) {
     startTransition(async () => {
       const result = await createMatchSeatReservation({
         ...values,
+        guestToken: getOrCreateGuestToken(),
         matchId,
         seats: selectedSeats.sort((a, b) => a - b),
       });

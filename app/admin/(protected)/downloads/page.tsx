@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { DownloadPriceCalculator } from "@/components/admin/DownloadPriceCalculator";
+import { DownloadRequestActions } from "@/components/admin/DownloadRequestActions";
 import { listDownloadRequests } from "@/lib/supabase/data";
 import { formatDateTime } from "@/lib/dates";
 
@@ -38,7 +39,9 @@ export default async function AdminDownloadsPage() {
                     <th className="px-4 py-3 text-left font-medium">File</th>
                     <th className="px-4 py-3 text-left font-medium">Customer</th>
                     <th className="px-4 py-3 text-left font-medium">Phone</th>
+                    <th className="px-4 py-3 text-left font-medium">Status</th>
                     <th className="px-4 py-3 text-left font-medium">Requested at</th>
+                    <th className="px-4 py-3 text-right font-medium">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -51,7 +54,17 @@ export default async function AdminDownloadsPage() {
                       <td className="px-4 py-3 font-medium">{request.file_name}</td>
                       <td className="px-4 py-3">{request.customer_name}</td>
                       <td className="px-4 py-3">{request.customer_phone}</td>
+                      <td className="px-4 py-3">
+                        {request.status === "HOLD"
+                          ? "Hold"
+                          : request.status === "ON_PROGRESS"
+                            ? "On progress"
+                            : "Finished"}
+                      </td>
                       <td className="px-4 py-3">{formatDateTime(request.created_at)}</td>
+                      <td className="px-4 py-3">
+                        <DownloadRequestActions request={request} />
+                      </td>
                     </tr>
                   ))}
                 </tbody>

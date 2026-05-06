@@ -40,13 +40,19 @@ export async function Navbar() {
             href="/matches"
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
-            Matches
+            {t.nav.matches}
           </Link>
           <Link
             href="/downloads"
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
-            Downloads
+            {t.nav.downloads}
+          </Link>
+          <Link
+            href="/my-activity"
+            className="text-muted-foreground transition-colors hover:text-foreground"
+          >
+            {t.nav.myActivity}
           </Link>
           <Link
             href={user ? "/admin" : "/admin/login"}
@@ -86,13 +92,19 @@ export async function Navbar() {
             href="/matches"
             className="rounded-full border border-white/10 px-3 py-1 text-muted-foreground transition-colors hover:text-foreground"
           >
-            Matches
+            {t.nav.matches}
           </Link>
           <Link
             href="/downloads"
             className="rounded-full border border-white/10 px-3 py-1 text-muted-foreground transition-colors hover:text-foreground"
           >
-            Downloads
+            {t.nav.downloads}
+          </Link>
+          <Link
+            href="/my-activity"
+            className="rounded-full border border-white/10 px-3 py-1 text-muted-foreground transition-colors hover:text-foreground"
+          >
+            {t.nav.myActivity}
           </Link>
           <Link
             href={user ? "/admin" : "/admin/login"}

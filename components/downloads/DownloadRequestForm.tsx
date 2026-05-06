@@ -20,6 +20,7 @@ import {
   type DownloadRequestInput,
 } from "@/lib/downloads/schemas";
 import { createDownloadRequest } from "@/actions/downloads";
+import { getOrCreateGuestToken } from "@/lib/guest/client";
 
 export function DownloadRequestForm() {
   const [isPending, startTransition] = useTransition();
@@ -35,7 +36,11 @@ export function DownloadRequestForm() {
 
   const onSubmit = form.handleSubmit((values) => {
     startTransition(async () => {
-      const result = await createDownloadRequest(values);
+      const withGuestToken = {
+        ...values,
+        guestToken: getOrCreateGuestToken(),
+      };
+      const result = await createDownloadRequest(withGuestToken);
       if (!result.ok) {
         toast.error(result.error);
         return;

@@ -24,6 +24,7 @@ export const matchSeatReservationSchema = z.object({
     .refine((value) => normalizeSyrianPhone(value) !== null, {
       message: "Use a valid Syrian mobile: 09XXXXXXXX or +9639XXXXXXXX",
     }),
+  guestToken: z.string().max(100).optional().or(z.literal("")),
   seats: z
     .array(z.number().int().min(1).max(20))
     .min(1, "Choose at least one seat")

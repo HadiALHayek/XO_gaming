@@ -33,6 +33,7 @@ create table if not exists public.reservations (
   customer_name text not null,
   customer_phone text,
   customer_discord text,
+  guest_token text,
   device_id uuid not null references public.devices(id) on delete cascade,
   start_time timestamptz not null,
   end_time timestamptz not null,
@@ -61,6 +62,7 @@ create table if not exists public.match_reservations (
   seat_number integer not null check (seat_number between 1 and 20),
   customer_name text not null,
   customer_phone text not null,
+  guest_token text,
   created_at timestamptz not null default now(),
   unique (match_id, seat_number)
 );
@@ -68,11 +70,21 @@ create table if not exists public.match_reservations (
 create table if not exists public.download_requests (
   id uuid primary key default gen_random_uuid(),
   category text not null check (category in ('GAMES', 'SERIES', 'FILMS')),
+  status text not null default 'HOLD' check (status in ('HOLD', 'ON_PROGRESS', 'FINISHED')),
   file_name text not null,
   customer_name text not null,
   customer_phone text not null,
+  guest_token text,
   created_at timestamptz not null default now()
 );
+
+alter table public.reservations add column if not exists guest_token text;
+alter table public.match_reservations add column if not exists guest_token text;
+alter table public.download_requests add column if not exists guest_token text;
+alter table public.download_requests add column if not exists status text not null default 'HOLD';
+alter table public.download_requests drop constraint if exists download_requests_status_check;
+alter table public.download_requests
+add constraint download_requests_status_check check (status in ('HOLD', 'ON_PROGRESS', 'FINISHED'));
 
 -- Blocked slots for maintenance
 create table if not exists public.blocked_slots (
@@ -112,11 +124,14 @@ on conflict (id) do nothing;
 
 create index if not exists idx_reservations_device_start on public.reservations(device_id, start_time);
 create index if not exists idx_reservations_device_end on public.reservations(device_id, end_time);
+create index if not exists idx_reservations_guest_token on public.reservations(guest_token);
 create index if not exists idx_blocked_slots_device_start on public.blocked_slots(device_id, start_time);
 create index if not exists idx_blocked_slots_device_end on public.blocked_slots(device_id, end_time);
 create index if not exists idx_matches_date on public.matches(match_date);
 create index if not exists idx_match_reservations_match on public.match_reservations(match_id);
+create index if not exists idx_match_reservations_guest_token on public.match_reservations(guest_token);
 create index if not exists idx_download_requests_created_at on public.download_requests(created_at desc);
+create index if not exists idx_download_requests_guest_token on public.download_requests(guest_token);
 create index if not exists idx_home_logo_images_created_at on public.home_logo_images(created_at desc);
 create index if not exists idx_home_drink_images_created_at on public.home_drink_images(created_at desc);
 

@@ -45,6 +45,7 @@ export const reservationCreateSchema = z
       .max(60, "Discord handle is too long")
       .optional()
       .or(z.literal("")),
+    guestToken: z.string().max(100).optional().or(z.literal("")),
     deviceIds: z.array(z.string().min(1)).min(1, "Select at least one device"),
     startTime: isoDate,
     durationHours: z.coerce.number().int().min(1).max(12),

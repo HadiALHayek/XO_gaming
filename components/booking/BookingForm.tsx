@@ -15,6 +15,7 @@ import {
   reservationCreateSchema,
 } from "@/lib/reservations/schemas";
 import { createReservation } from "@/actions/reservations";
+import { getOrCreateGuestToken } from "@/lib/guest/client";
 import { CalendarView } from "./CalendarView";
 import { toDateTimeLocalInput } from "@/lib/dates";
 import { useI18n } from "@/components/providers/I18nProvider";
@@ -88,6 +89,7 @@ export function BookingForm({ devices }: Props) {
       const startIso = new Date(values.startTime).toISOString();
       const result = await createReservation({
         ...values,
+        guestToken: getOrCreateGuestToken(),
         startTime: startIso,
       });
       if (!result.ok) {
