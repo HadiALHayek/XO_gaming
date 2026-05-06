@@ -31,7 +31,7 @@ export function AdminSidebar({ email }: { email?: string | null }) {
   const pathname = usePathname();
 
   return (
-    <aside className="glass sticky top-4 flex h-[calc(100dvh-2rem)] w-full flex-col overflow-hidden p-4 lg:w-64">
+    <aside className="glass flex w-full flex-col p-4 lg:w-64">
       <Link
         href="/"
         className="mb-6 flex items-center gap-2 px-2 text-base font-semibold"
