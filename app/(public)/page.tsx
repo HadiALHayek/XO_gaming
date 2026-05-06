@@ -3,19 +3,25 @@ import { CalendarCheck, Gamepad2, Monitor, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { DeviceCard } from "@/components/DeviceCard";
+import { DrinkImagesCarousel } from "@/components/home/DrinkImagesCarousel";
 import { GameLogosCarousel } from "@/components/home/GameLogosCarousel";
 import { getDevicesWithCurrentStatus } from "@/lib/queries";
 import { getDictionary } from "@/lib/i18n/server";
-import { getSiteSettings, listHomeLogoImages } from "@/lib/supabase/data";
+import {
+  getSiteSettings,
+  listHomeDrinkImages,
+  listHomeLogoImages,
+} from "@/lib/supabase/data";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [devices, { t }, settings, logos] = await Promise.all([
+  const [devices, { t }, settings, logos, drinks] = await Promise.all([
     getDevicesWithCurrentStatus(),
     getDictionary(),
     getSiteSettings().catch(() => null),
     listHomeLogoImages().catch(() => []),
+    listHomeDrinkImages().catch(() => []),
   ]);
 
   const pcCount = devices.filter((d) => d.type === "PC").length;
@@ -114,7 +120,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {settings?.home_video_url || logos.length > 0 ? (
+      {settings?.home_video_url || logos.length > 0 || drinks.length > 0 ? (
         <section className="space-y-4">
           <div>
             <h2 className="font-display text-2xl font-bold md:text-3xl">
@@ -124,7 +130,7 @@ export default async function HomePage() {
               Watch the latest promo and featured game logos.
             </p>
           </div>
-          <div className="mx-auto grid w-full max-w-5xl gap-4 md:grid-cols-2">
+          <div className="mx-auto grid w-full max-w-6xl gap-4 md:grid-cols-2 lg:grid-cols-3">
             {settings?.home_video_url ? (
               <Card className="overflow-hidden">
                 <CardContent className="p-0">
@@ -141,6 +147,7 @@ export default async function HomePage() {
               </Card>
             ) : null}
             {logos.length > 0 ? <GameLogosCarousel logos={logos} /> : null}
+            {drinks.length > 0 ? <DrinkImagesCarousel drinks={drinks} /> : null}
           </div>
         </section>
       ) : null}

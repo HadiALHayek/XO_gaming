@@ -90,6 +90,13 @@ create table if not exists public.home_logo_images (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.home_drink_images (
+  id uuid primary key default gen_random_uuid(),
+  image_path text not null unique,
+  image_url text not null,
+  created_at timestamptz not null default now()
+);
+
 insert into public.site_settings (id)
 values (1)
 on conflict (id) do nothing;
@@ -101,6 +108,7 @@ create index if not exists idx_blocked_slots_device_end on public.blocked_slots(
 create index if not exists idx_matches_date on public.matches(match_date);
 create index if not exists idx_match_reservations_match on public.match_reservations(match_id);
 create index if not exists idx_home_logo_images_created_at on public.home_logo_images(created_at desc);
+create index if not exists idx_home_drink_images_created_at on public.home_drink_images(created_at desc);
 
 insert into public.devices (name, type)
 values
@@ -127,6 +135,7 @@ alter table public.site_settings enable row level security;
 alter table public.matches enable row level security;
 alter table public.match_reservations enable row level security;
 alter table public.home_logo_images enable row level security;
+alter table public.home_drink_images enable row level security;
 
 -- Public read access (for live availability)
 drop policy if exists "public read devices" on public.devices;
@@ -151,6 +160,10 @@ for select to anon using (true);
 
 drop policy if exists "public read home_logo_images" on public.home_logo_images;
 create policy "public read home_logo_images" on public.home_logo_images
+for select to anon using (true);
+
+drop policy if exists "public read home_drink_images" on public.home_drink_images;
+create policy "public read home_drink_images" on public.home_drink_images
 for select to anon using (true);
 
 -- Public can create bookings without login
@@ -187,6 +200,10 @@ drop policy if exists "admin full home_logo_images" on public.home_logo_images;
 create policy "admin full home_logo_images" on public.home_logo_images
 for all to authenticated using (true) with check (true);
 
+drop policy if exists "admin full home_drink_images" on public.home_drink_images;
+create policy "admin full home_drink_images" on public.home_drink_images
+for all to authenticated using (true) with check (true);
+
 drop policy if exists "public read site_settings" on public.site_settings;
 create policy "public read site_settings" on public.site_settings
 for select to anon using (true);
@@ -203,6 +220,19 @@ values (
   true,
   52428800,
   array['video/mp4', 'video/webm', 'video/ogg']
+)
+on conflict (id) do update set
+  public = excluded.public,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'drink-images',
+  'drink-images',
+  true,
+  10485760,
+  array['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif']
 )
 on conflict (id) do update set
   public = excluded.public,
@@ -253,4 +283,20 @@ for update to authenticated using (bucket_id = 'game-logos') with check (bucket_
 drop policy if exists "admin delete game logos" on storage.objects;
 create policy "admin delete game logos" on storage.objects
 for delete to authenticated using (bucket_id = 'game-logos');
+
+drop policy if exists "public read drink images" on storage.objects;
+create policy "public read drink images" on storage.objects
+for select to anon using (bucket_id = 'drink-images');
+
+drop policy if exists "admin upload drink images" on storage.objects;
+create policy "admin upload drink images" on storage.objects
+for insert to authenticated with check (bucket_id = 'drink-images');
+
+drop policy if exists "admin update drink images" on storage.objects;
+create policy "admin update drink images" on storage.objects
+for update to authenticated using (bucket_id = 'drink-images') with check (bucket_id = 'drink-images');
+
+drop policy if exists "admin delete drink images" on storage.objects;
+create policy "admin delete drink images" on storage.objects
+for delete to authenticated using (bucket_id = 'drink-images');
 

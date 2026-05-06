@@ -1,6 +1,11 @@
 import { HomeVideoManager } from "@/components/admin/HomeVideoManager";
+import { HomeDrinkManager } from "@/components/admin/HomeDrinkManager";
 import { HomeLogoManager } from "@/components/admin/HomeLogoManager";
-import { getSiteSettings, listHomeLogoImages } from "@/lib/supabase/data";
+import {
+  getSiteSettings,
+  listHomeDrinkImages,
+  listHomeLogoImages,
+} from "@/lib/supabase/data";
 
 export const dynamic = "force-dynamic";
 
@@ -9,9 +14,10 @@ export const metadata = {
 };
 
 export default async function AdminMediaPage() {
-  const [settings, logos] = await Promise.all([
+  const [settings, logos, drinks] = await Promise.all([
     getSiteSettings().catch(() => null),
     listHomeLogoImages().catch(() => []),
+    listHomeDrinkImages().catch(() => []),
   ]);
 
   return (
@@ -28,6 +34,7 @@ export default async function AdminMediaPage() {
         currentPath={settings?.home_video_path ?? null}
       />
       <HomeLogoManager logos={logos} />
+      <HomeDrinkManager drinks={drinks} />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import type {
   BlockedSlot,
   BlockedSlotWithDevice,
   Device,
+  HomeDrinkImage,
   HomeLogoImage,
   Match,
   MatchReservation,
@@ -221,5 +222,15 @@ export async function listHomeLogoImages(): Promise<HomeLogoImage[]> {
     .order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
   return (data as HomeLogoImage[]) ?? [];
+}
+
+export async function listHomeDrinkImages(): Promise<HomeDrinkImage[]> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("home_drink_images")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(error.message);
+  return (data as HomeDrinkImage[]) ?? [];
 }
 
