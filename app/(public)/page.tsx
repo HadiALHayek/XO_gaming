@@ -114,6 +114,8 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {logos.length > 0 ? <GameLogosCarousel logos={logos} /> : null}
+
       {settings?.home_video_url ? (
         <section className="space-y-4">
           <div>
@@ -139,8 +141,6 @@ export default async function HomePage() {
           </Card>
         </section>
       ) : null}
-
-      {logos.length > 0 ? <GameLogosCarousel logos={logos} /> : null}
 
       <section id="availability" className="space-y-6">
         <div className="flex items-end justify-between gap-4">

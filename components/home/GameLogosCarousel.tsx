@@ -21,9 +21,9 @@ export function GameLogosCarousel({ logos }: Props) {
   if (logos.length === 0) return null;
 
   return (
-    <section className="space-y-4">
+    <section className="mx-auto w-full max-w-xs space-y-3 sm:max-w-sm">
       <div>
-        <h2 className="font-display text-2xl font-bold md:text-3xl">
+        <h2 className="font-display text-xl font-bold md:text-2xl">
           <span className="gradient-text">Featured</span> Game Logos
         </h2>
         <p className="text-sm text-muted-foreground">
@@ -32,7 +32,7 @@ export function GameLogosCarousel({ logos }: Props) {
       </div>
 
       <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/30">
-        <div className="relative h-44 sm:h-56 md:h-72">
+        <div className="relative aspect-square">
           {logos.map((logo, i) => (
             <img
               key={logo.id}
