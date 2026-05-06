@@ -34,7 +34,6 @@ import {
   updateReservation,
 } from "@/actions/reservations";
 import { toDateTimeLocalInput } from "@/lib/dates";
-import { DeviceLayoutMap } from "@/components/device-map/DeviceLayoutMap";
 
 type Props = {
   devices: Device[];
@@ -60,7 +59,6 @@ export function ReservationFormDialog({
 }: Props) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const [useMapLayout, setUseMapLayout] = useState(true);
   const isEdit = Boolean(reservation);
   const pcLeftSide = devices.filter((d) => {
     const n = getPcNumber(d.name);
@@ -164,25 +162,8 @@ export function ReservationFormDialog({
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <Label htmlFor="r-device">Device{isEdit ? "" : "s"}</Label>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => setUseMapLayout((prev) => !prev)}
-              >
-                {useMapLayout ? "Use simple list" : "Use layout map"}
-              </Button>
-            </div>
-            {useMapLayout ? (
-              <DeviceLayoutMap
-                devices={devices}
-                selectedDeviceIds={form.watch("deviceIds")}
-                onToggleDevice={toggleDevice}
-                multiSelect={!isEdit}
-              />
-            ) : isEdit ? (
+            <Label htmlFor="r-device">Device{isEdit ? "" : "s"}</Label>
+            {isEdit ? (
               <Select
                 value={form.watch("deviceIds")[0] ?? ""}
                 onValueChange={(v) =>
