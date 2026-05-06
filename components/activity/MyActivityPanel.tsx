@@ -4,8 +4,6 @@ import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { getOrCreateGuestToken } from "@/lib/guest/client";
 import { getUserActivity } from "@/actions/activity";
 import { formatDateTime } from "@/lib/dates";
@@ -35,29 +33,12 @@ type ActivityData = {
 
 export function MyActivityPanel() {
   const [isPending, startTransition] = useTransition();
-  const [phone, setPhone] = useState("");
   const [data, setData] = useState<ActivityData | null>(null);
 
-  const loadByGuestToken = () => {
+  const loadActivity = () => {
     startTransition(async () => {
-      const result = await getUserActivity({
-        guestToken: getOrCreateGuestToken(),
-      });
-      if (!result.ok) return;
-      setData(result.data);
-    });
-  };
-
-  useEffect(() => {
-    loadByGuestToken();
-  }, []);
-
-  const loadByPhone = () => {
-    startTransition(async () => {
-      const result = await getUserActivity({
-        guestToken: getOrCreateGuestToken(),
-        phone,
-      });
+      getOrCreateGuestToken();
+      const result = await getUserActivity();
       if (!result.ok) {
         toast.error(result.error);
         return;
@@ -66,25 +47,17 @@ export function MyActivityPanel() {
     });
   };
 
+  useEffect(() => {
+    loadActivity();
+  }, []);
+
   return (
     <div className="space-y-6">
       <Card>
         <CardContent className="space-y-4 p-6">
-          <div className="space-y-1.5">
-            <Label htmlFor="activity-phone">Find with phone number (optional)</Label>
-            <Input
-              id="activity-phone"
-              placeholder="09XXXXXXXX or +9639XXXXXXXX"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-          </div>
           <div className="flex flex-wrap gap-2">
-            <Button onClick={loadByPhone} disabled={isPending}>
+            <Button onClick={loadActivity} disabled={isPending}>
               {isPending ? "Loading..." : "Load my activity"}
-            </Button>
-            <Button variant="outline" onClick={loadByGuestToken} disabled={isPending}>
-              Use this device history
             </Button>
           </div>
         </CardContent>

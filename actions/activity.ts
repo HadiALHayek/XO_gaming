@@ -1,7 +1,7 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { normalizeSyrianPhone } from "@/lib/reservations/schemas";
 
 export type UserActivityResult =
   | {
@@ -31,14 +31,10 @@ export type UserActivityResult =
     }
   | { ok: false; error: string };
 
-export async function getUserActivity(input: {
-  guestToken?: string;
-  phone?: string;
-}): Promise<UserActivityResult> {
-  const guestToken = input.guestToken?.trim() || null;
-  const normalizedPhone = input.phone ? normalizeSyrianPhone(input.phone) : null;
-  if (!guestToken && !normalizedPhone) {
-    return { ok: false, error: "Provide phone number or guest token." };
+export async function getUserActivity(): Promise<UserActivityResult> {
+  const guestToken = cookies().get("xo_guest_token")?.value?.trim() || null;
+  if (!guestToken) {
+    return { ok: false, error: "No saved activity cookie found on this device." };
   }
 
   const supabase = await createSupabaseServerClient();
@@ -52,25 +48,9 @@ export async function getUserActivity(input: {
     .from("match_reservations")
     .select("id,seat_number,created_at,match:matches(title)");
 
-  if (guestToken && normalizedPhone) {
-    reservationQuery.or(
-      `guest_token.eq.${encodeURIComponent(guestToken)},customer_phone.eq.${encodeURIComponent(normalizedPhone)}`,
-    );
-    downloadQuery.or(
-      `guest_token.eq.${encodeURIComponent(guestToken)},customer_phone.eq.${encodeURIComponent(normalizedPhone)}`,
-    );
-    matchQuery.or(
-      `guest_token.eq.${encodeURIComponent(guestToken)},customer_phone.eq.${encodeURIComponent(normalizedPhone)}`,
-    );
-  } else if (guestToken) {
-    reservationQuery.eq("guest_token", guestToken);
-    downloadQuery.eq("guest_token", guestToken);
-    matchQuery.eq("guest_token", guestToken);
-  } else if (normalizedPhone) {
-    reservationQuery.eq("customer_phone", normalizedPhone);
-    downloadQuery.eq("customer_phone", normalizedPhone);
-    matchQuery.eq("customer_phone", normalizedPhone);
-  }
+  reservationQuery.eq("guest_token", guestToken);
+  downloadQuery.eq("guest_token", guestToken);
+  matchQuery.eq("guest_token", guestToken);
 
   const [
     { data: reservations, error: reservationsError },
