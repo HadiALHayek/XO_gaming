@@ -34,6 +34,7 @@ import {
   updateReservation,
 } from "@/actions/reservations";
 import { toDateTimeLocalInput } from "@/lib/dates";
+import { DeviceLayoutMap } from "@/components/device-map/DeviceLayoutMap";
 
 type Props = {
   devices: Device[];
@@ -59,6 +60,7 @@ export function ReservationFormDialog({
 }: Props) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [useMapLayout, setUseMapLayout] = useState(true);
   const isEdit = Boolean(reservation);
   const pcLeftSide = devices.filter((d) => {
     const n = getPcNumber(d.name);
@@ -136,6 +138,18 @@ export function ReservationFormDialog({
     });
   });
 
+  const toggleDevice = (deviceId: string) => {
+    const current = form.getValues("deviceIds");
+    if (isEdit) {
+      form.setValue("deviceIds", [deviceId], { shouldValidate: true });
+      return;
+    }
+    const next = current.includes(deviceId)
+      ? current.filter((id) => id !== deviceId)
+      : [...current, deviceId];
+    form.setValue("deviceIds", next, { shouldValidate: true });
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
@@ -150,8 +164,25 @@ export function ReservationFormDialog({
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="r-device">Device{isEdit ? "" : "s"}</Label>
-            {isEdit ? (
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <Label htmlFor="r-device">Device{isEdit ? "" : "s"}</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setUseMapLayout((prev) => !prev)}
+              >
+                {useMapLayout ? "Use simple list" : "Use layout map"}
+              </Button>
+            </div>
+            {useMapLayout ? (
+              <DeviceLayoutMap
+                devices={devices}
+                selectedDeviceIds={form.watch("deviceIds")}
+                onToggleDevice={toggleDevice}
+                multiSelect={!isEdit}
+              />
+            ) : isEdit ? (
               <Select
                 value={form.watch("deviceIds")[0] ?? ""}
                 onValueChange={(v) =>
@@ -181,13 +212,7 @@ export function ReservationFormDialog({
                           <button
                             key={d.id}
                             type="button"
-                            onClick={() => {
-                              const current = form.getValues("deviceIds");
-                              const next = current.includes(d.id)
-                                ? current.filter((id) => id !== d.id)
-                                : [...current, d.id];
-                              form.setValue("deviceIds", next, { shouldValidate: true });
-                            }}
+                            onClick={() => toggleDevice(d.id)}
                             className={[
                               "rounded-md border px-3 py-2 text-left text-sm transition",
                               selected
@@ -210,13 +235,7 @@ export function ReservationFormDialog({
                           <button
                             key={d.id}
                             type="button"
-                            onClick={() => {
-                              const current = form.getValues("deviceIds");
-                              const next = current.includes(d.id)
-                                ? current.filter((id) => id !== d.id)
-                                : [...current, d.id];
-                              form.setValue("deviceIds", next, { shouldValidate: true });
-                            }}
+                            onClick={() => toggleDevice(d.id)}
                             className={[
                               "rounded-md border px-3 py-2 text-left text-sm transition",
                               selected
@@ -236,28 +255,22 @@ export function ReservationFormDialog({
                     <p className="text-xs text-muted-foreground">Other devices</p>
                     <div className="grid gap-2 sm:grid-cols-2">
                       {otherDevices.map((d) => {
-                  const selected = form.watch("deviceIds").includes(d.id);
-                  return (
-                    <button
-                      key={d.id}
-                      type="button"
-                      onClick={() => {
-                        const current = form.getValues("deviceIds");
-                        const next = current.includes(d.id)
-                          ? current.filter((id) => id !== d.id)
-                          : [...current, d.id];
-                        form.setValue("deviceIds", next, { shouldValidate: true });
-                      }}
-                      className={[
-                        "rounded-md border px-3 py-2 text-left text-sm transition",
-                        selected
-                          ? "border-neon-purple/50 bg-neon-purple/20"
-                          : "border-white/10 bg-white/5 hover:bg-white/10",
-                      ].join(" ")}
-                    >
-                      {d.name} - {d.type}
-                    </button>
-                  );
+                        const selected = form.watch("deviceIds").includes(d.id);
+                        return (
+                          <button
+                            key={d.id}
+                            type="button"
+                            onClick={() => toggleDevice(d.id)}
+                            className={[
+                              "rounded-md border px-3 py-2 text-left text-sm transition",
+                              selected
+                                ? "border-neon-purple/50 bg-neon-purple/20"
+                                : "border-white/10 bg-white/5 hover:bg-white/10",
+                            ].join(" ")}
+                          >
+                            {d.name} - {d.type}
+                          </button>
+                        );
                       })}
                     </div>
                   </div>

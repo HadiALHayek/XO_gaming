@@ -5,6 +5,7 @@ import { ReservationFilters } from "@/components/admin/ReservationFilters";
 import { ReservationActions } from "@/components/admin/ReservationActions";
 import { ReservationFormDialog } from "@/components/admin/ReservationFormDialog";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getAllDevicesWithCurrentStatus } from "@/lib/queries";
 import { formatDateTime, durationHours } from "@/lib/dates";
 
 export const dynamic = "force-dynamic";
@@ -38,9 +39,9 @@ export default async function AdminReservationsPage({
     end.setDate(end.getDate() + 1);
     query = query.gte("start_time", start.toISOString()).lt("start_time", end.toISOString());
   }
-  const [{ data: reservations }, { data: devices }] = await Promise.all([
+  const [{ data: reservations }, devices] = await Promise.all([
     query,
-    supabase.from("devices").select("*").order("name", { ascending: true }),
+    getAllDevicesWithCurrentStatus(),
   ]);
 
   return (

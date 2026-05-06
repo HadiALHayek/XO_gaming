@@ -1,5 +1,5 @@
 import { BookingForm } from "@/components/booking/BookingForm";
-import { getActiveDevices } from "@/lib/queries";
+import { getDevicesWithCurrentStatus } from "@/lib/queries";
 import { getDictionary } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
@@ -10,7 +10,10 @@ export const metadata = {
 };
 
 export default async function BookPage() {
-  const [devices, { t }] = await Promise.all([getActiveDevices(), getDictionary()]);
+  const [devices, { t }] = await Promise.all([
+    getDevicesWithCurrentStatus(),
+    getDictionary(),
+  ]);
 
   return (
     <div className="container space-y-8 py-12">
