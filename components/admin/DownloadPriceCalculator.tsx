@@ -11,7 +11,7 @@ export function DownloadPriceCalculator() {
   const price = useMemo(() => {
     const value = Number(sizeGb);
     if (Number.isNaN(value) || value < 0) return 0;
-    return value * 1;
+    return value * 2;
   }, [sizeGb]);
 
   return (
@@ -19,7 +19,7 @@ export function DownloadPriceCalculator() {
       <CardHeader>
         <CardTitle>Download Price Calculator</CardTitle>
         <CardDescription>
-          Price rule: 1 Syrian Pound for each 1 GB downloaded.
+          Price rule: 2 Syrian Pound for each 1 GB downloaded.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
