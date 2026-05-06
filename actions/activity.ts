@@ -32,7 +32,8 @@ export type UserActivityResult =
   | { ok: false; error: string };
 
 export async function getUserActivity(): Promise<UserActivityResult> {
-  const guestToken = cookies().get("xo_guest_token")?.value?.trim() || null;
+  const cookieStore = await cookies();
+  const guestToken = cookieStore.get("xo_guest_token")?.value?.trim() || null;
   if (!guestToken) {
     return { ok: false, error: "No saved activity cookie found on this device." };
   }
