@@ -83,8 +83,11 @@ export default async function AdminOverviewPage() {
   const byDevice = new Map<string, { label: string; count: number }>();
   const hourBuckets = new Map<number, number>();
   for (const reservation of allReservations ?? []) {
-    const deviceName = reservation.device?.name ?? "Unknown";
-    const deviceType = reservation.device?.type ?? "";
+    const deviceRelation = Array.isArray(reservation.device)
+      ? reservation.device[0]
+      : reservation.device;
+    const deviceName = deviceRelation?.name ?? "Unknown";
+    const deviceType = deviceRelation?.type ?? "";
     const key = `${deviceName}-${deviceType}`;
     const current = byDevice.get(key) ?? {
       label: deviceType ? `${deviceName} (${deviceType})` : deviceName,
