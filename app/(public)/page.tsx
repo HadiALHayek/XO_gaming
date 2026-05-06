@@ -114,31 +114,34 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {logos.length > 0 ? <GameLogosCarousel logos={logos} /> : null}
-
-      {settings?.home_video_url ? (
+      {settings?.home_video_url || logos.length > 0 ? (
         <section className="space-y-4">
           <div>
             <h2 className="font-display text-2xl font-bold md:text-3xl">
               <span className="gradient-text">XO</span> Highlights
             </h2>
             <p className="text-sm text-muted-foreground">
-              Watch the latest promo from the lounge.
+              Watch the latest promo and featured game logos.
             </p>
           </div>
-          <Card className="overflow-hidden">
-            <CardContent className="p-0">
-              <video
-                src={settings.home_video_url}
-                controls
-                autoPlay
-                muted
-                loop
-                playsInline
-                className="max-h-[540px] w-full bg-black object-cover"
-              />
-            </CardContent>
-          </Card>
+          <div className="flex flex-col items-start gap-4 lg:flex-row lg:items-stretch">
+            {settings?.home_video_url ? (
+              <Card className="w-full overflow-hidden lg:w-[640px]">
+                <CardContent className="p-0">
+                  <video
+                    src={settings.home_video_url}
+                    controls
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="h-[220px] w-full bg-black object-cover sm:h-[260px] lg:h-[320px]"
+                  />
+                </CardContent>
+              </Card>
+            ) : null}
+            {logos.length > 0 ? <GameLogosCarousel logos={logos} /> : null}
+          </div>
         </section>
       ) : null}
 

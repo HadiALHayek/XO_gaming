@@ -21,7 +21,7 @@ export function GameLogosCarousel({ logos }: Props) {
   if (logos.length === 0) return null;
 
   return (
-    <section className="mx-auto w-full max-w-xs space-y-3 sm:max-w-sm">
+    <section className="w-[280px] space-y-3 sm:w-[320px]">
       <div>
         <h2 className="font-display text-xl font-bold md:text-2xl">
           <span className="gradient-text">Featured</span> Game Logos
