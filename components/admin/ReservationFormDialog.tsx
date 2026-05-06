@@ -56,7 +56,7 @@ export function ReservationFormDialog({
         customerName: reservation.customer_name,
         customerPhone: reservation.customer_phone ?? "",
         customerDiscord: reservation.customer_discord ?? "",
-        deviceId: reservation.device_id,
+        deviceIds: [reservation.device_id],
         startTime: toDateTimeLocalInput(new Date(reservation.start_time)),
         durationHours: Math.max(
           1,
@@ -79,7 +79,7 @@ export function ReservationFormDialog({
       customerName: "",
       customerPhone: "",
       customerDiscord: "",
-      deviceId: devices[0]?.id ?? "",
+      deviceIds: devices[0]?.id ? [devices[0].id] : [],
       startTime: toDateTimeLocalInput(start),
       durationHours: Math.max(
         1,
@@ -130,24 +130,58 @@ export function ReservationFormDialog({
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="r-device">Device</Label>
-            <Select
-              value={form.watch("deviceId")}
-              onValueChange={(v) =>
-                form.setValue("deviceId", v, { shouldValidate: true })
-              }
-            >
-              <SelectTrigger id="r-device">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {devices.map((d) => (
-                  <SelectItem key={d.id} value={d.id}>
-                    {d.name} - {d.type}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label htmlFor="r-device">Device{isEdit ? "" : "s"}</Label>
+            {isEdit ? (
+              <Select
+                value={form.watch("deviceIds")[0] ?? ""}
+                onValueChange={(v) =>
+                  form.setValue("deviceIds", [v], { shouldValidate: true })
+                }
+              >
+                <SelectTrigger id="r-device">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {devices.map((d) => (
+                    <SelectItem key={d.id} value={d.id}>
+                      {d.name} - {d.type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <div className="grid gap-2 sm:grid-cols-2">
+                {devices.map((d) => {
+                  const selected = form.watch("deviceIds").includes(d.id);
+                  return (
+                    <button
+                      key={d.id}
+                      type="button"
+                      onClick={() => {
+                        const current = form.getValues("deviceIds");
+                        const next = current.includes(d.id)
+                          ? current.filter((id) => id !== d.id)
+                          : [...current, d.id];
+                        form.setValue("deviceIds", next, { shouldValidate: true });
+                      }}
+                      className={[
+                        "rounded-md border px-3 py-2 text-left text-sm transition",
+                        selected
+                          ? "border-neon-purple/50 bg-neon-purple/20"
+                          : "border-white/10 bg-white/5 hover:bg-white/10",
+                      ].join(" ")}
+                    >
+                      {d.name} - {d.type}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            {form.formState.errors.deviceIds ? (
+              <p className="text-xs text-red-400">
+                {form.formState.errors.deviceIds.message as string}
+              </p>
+            ) : null}
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">

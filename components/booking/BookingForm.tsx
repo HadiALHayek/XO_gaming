@@ -11,13 +11,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   ReservationCreateInput,
   reservationCreateSchema,
 } from "@/lib/reservations/schemas";
@@ -47,22 +40,24 @@ export function BookingForm({ devices }: Props) {
       customerName: "",
       customerPhone: "",
       customerDiscord: "",
-      deviceId: devices[0]?.id ?? "",
+      deviceIds: devices[0]?.id ? [devices[0].id] : [],
       startTime: toDateTimeLocalInput(defaultStart),
       durationHours: 1,
       notes: "",
+      reservationType: "ONE_TIME",
     },
   });
 
-  const deviceId = form.watch("deviceId");
+  const deviceIds = form.watch("deviceIds");
+  const primaryDeviceId = deviceIds[0] ?? null;
   const startTime = form.watch("startTime");
   const durationHours = form.watch("durationHours");
 
   useEffect(() => {
-    if (!deviceId && devices[0]) {
-      form.setValue("deviceId", devices[0].id);
+    if (deviceIds.length === 0 && devices[0]) {
+      form.setValue("deviceIds", [devices[0].id]);
     }
-  }, [deviceId, devices, form]);
+  }, [deviceIds, devices, form]);
 
   const handleCalendarSelect = (start: Date, end: Date) => {
     const duration = Math.max(1, Math.round((end.getTime() - start.getTime()) / 3600000));
@@ -120,7 +115,15 @@ export function BookingForm({ devices }: Props) {
     );
   }
 
-  const selectedDevice = devices.find((d) => d.id === deviceId);
+  const selectedDevices = devices.filter((d) => deviceIds.includes(d.id));
+
+  const toggleDevice = (deviceId: string) => {
+    const current = form.getValues("deviceIds");
+    const next = current.includes(deviceId)
+      ? current.filter((id) => id !== deviceId)
+      : [...current, deviceId];
+    form.setValue("deviceIds", next, { shouldValidate: true });
+  };
 
   return (
     <div className="grid gap-6 xl:grid-cols-[1fr_1.4fr]">
@@ -137,32 +140,40 @@ export function BookingForm({ devices }: Props) {
 
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="deviceId">{t.book.device}</Label>
-              <Select
-                value={deviceId}
-                onValueChange={(value) =>
-                  form.setValue("deviceId", value, { shouldValidate: true })
-                }
-              >
-                <SelectTrigger id="deviceId">
-                  <SelectValue placeholder={t.book.chooseDevice} />
-                </SelectTrigger>
-                <SelectContent>
-                  {devices.map((device) => (
-                    <SelectItem
+              <Label>{t.book.device}</Label>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {devices.map((device) => {
+                  const checked = deviceIds.includes(device.id);
+                  return (
+                    <button
                       key={device.id}
-                      value={device.id}
+                      type="button"
                       disabled={!device.is_active}
+                      onClick={() => toggleDevice(device.id)}
+                      className={[
+                        "rounded-md border px-3 py-2 text-left text-sm transition",
+                        !device.is_active
+                          ? "cursor-not-allowed border-white/10 bg-white/5 text-muted-foreground"
+                          : checked
+                            ? "border-neon-purple/50 bg-neon-purple/20"
+                            : "border-white/10 bg-white/5 hover:bg-white/10",
+                      ].join(" ")}
                     >
-                      {device.name} - {device.type}
-                      {!device.is_active ? " (maintenance)" : ""}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {form.formState.errors.deviceId ? (
+                      <div className="font-medium">
+                        {device.name} - {device.type}
+                      </div>
+                      {!device.is_active ? (
+                        <div className="text-xs text-muted-foreground">
+                          maintenance
+                        </div>
+                      ) : null}
+                    </button>
+                  );
+                })}
+              </div>
+              {form.formState.errors.deviceIds ? (
                 <p className="text-xs text-red-400">
-                  {form.formState.errors.deviceId.message}
+                  {form.formState.errors.deviceIds.message as string}
                 </p>
               ) : null}
             </div>
@@ -248,11 +259,13 @@ export function BookingForm({ devices }: Props) {
               {isPending ? t.book.booking : t.book.confirm}
             </Button>
 
-            {selectedDevice ? (
+            {selectedDevices.length > 0 ? (
               <p className="text-xs text-muted-foreground">
                 {t.book.bookingSummary}{" "}
                 <span className="text-foreground">
-                  {selectedDevice.name} ({selectedDevice.type})
+                  {selectedDevices
+                    .map((d) => `${d.name} (${d.type})`)
+                    .join(", ")}
                 </span>{" "}
                 {t.book.from}{" "}
                 <span className="text-foreground">
@@ -286,7 +299,7 @@ export function BookingForm({ devices }: Props) {
           </div>
           <CalendarView
             key={calendarTick}
-            deviceId={deviceId || null}
+            deviceId={primaryDeviceId}
             onSelect={handleCalendarSelect}
           />
         </CardContent>

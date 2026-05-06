@@ -26,33 +26,37 @@ export async function createReservation(input: ReservationCreateInput): Promise<
   const end = new Date(start.getTime() + parsed.data.durationHours * 60 * 60 * 1000);
   const normalizedPhone = normalizeSyrianPhone(parsed.data.customerPhone);
   if (!normalizedPhone) return { ok: false, error: "Invalid phone format." };
-  const availability = await checkAvailability(parsed.data.deviceId, start, end, {
-    repeatDaily: parsed.data.reservationType === "DAILY",
-  });
-  if (!availability.ok) return { ok: false, error: availability.message };
+  for (const deviceId of parsed.data.deviceIds) {
+    const availability = await checkAvailability(deviceId, start, end, {
+      repeatDaily: parsed.data.reservationType === "DAILY",
+    });
+    if (!availability.ok) return { ok: false, error: availability.message };
+  }
 
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from("reservations")
-    .insert({
-      customer_name: parsed.data.customerName.trim(),
-      customer_phone: normalizedPhone,
-      customer_discord: parsed.data.customerDiscord?.trim() || null,
-      device_id: parsed.data.deviceId,
-      start_time: start.toISOString(),
-      end_time: end.toISOString(),
-      is_daily_recurring: parsed.data.reservationType === "DAILY",
-      notes: parsed.data.notes?.trim() || null,
-    })
+    .insert(
+      parsed.data.deviceIds.map((deviceId) => ({
+        customer_name: parsed.data.customerName.trim(),
+        customer_phone: normalizedPhone,
+        customer_discord: parsed.data.customerDiscord?.trim() || null,
+        device_id: deviceId,
+        start_time: start.toISOString(),
+        end_time: end.toISOString(),
+        is_daily_recurring: parsed.data.reservationType === "DAILY",
+        notes: parsed.data.notes?.trim() || null,
+      })),
+    )
     .select("id")
-    .single();
+    .limit(1);
   if (error) return { ok: false, error: error.message };
 
   revalidatePath("/");
   revalidatePath("/book");
   revalidatePath("/admin");
   revalidatePath("/admin/reservations");
-  return { ok: true, data: { id: data.id as string } };
+  return { ok: true, data: { id: (data?.[0]?.id as string) ?? "" } };
 }
 
 export async function updateReservation(input: ReservationUpdateInput): Promise<ActionResult> {
@@ -65,7 +69,8 @@ export async function updateReservation(input: ReservationUpdateInput): Promise<
   const normalizedPhone = normalizeSyrianPhone(parsed.data.customerPhone);
   if (!normalizedPhone) return { ok: false, error: "Invalid phone format." };
 
-  const availability = await checkAvailability(parsed.data.deviceId, start, end, {
+  const firstDeviceId = parsed.data.deviceIds[0];
+  const availability = await checkAvailability(firstDeviceId, start, end, {
     repeatDaily: parsed.data.reservationType === "DAILY",
     excludeReservationId: parsed.data.id,
   });
@@ -78,7 +83,7 @@ export async function updateReservation(input: ReservationUpdateInput): Promise<
       customer_name: parsed.data.customerName.trim(),
       customer_phone: normalizedPhone,
       customer_discord: parsed.data.customerDiscord?.trim() || null,
-      device_id: parsed.data.deviceId,
+      device_id: firstDeviceId,
       start_time: start.toISOString(),
       end_time: end.toISOString(),
       is_daily_recurring: parsed.data.reservationType === "DAILY",
