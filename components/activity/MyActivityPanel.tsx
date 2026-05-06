@@ -10,9 +10,28 @@ import { getOrCreateGuestToken } from "@/lib/guest/client";
 import { getUserActivity } from "@/actions/activity";
 import { formatDateTime } from "@/lib/dates";
 
-type ActivityData = Awaited<ReturnType<typeof getUserActivity>> extends { ok: true; data: infer T }
-  ? T
-  : never;
+type ActivityData = {
+  reservations: Array<{
+    id: string;
+    device_name: string;
+    start_time: string;
+    end_time: string;
+    created_at: string;
+  }>;
+  downloadRequests: Array<{
+    id: string;
+    category: string;
+    status: string;
+    file_name: string;
+    created_at: string;
+  }>;
+  matchReservations: Array<{
+    id: string;
+    match_title: string;
+    seat_number: number;
+    created_at: string;
+  }>;
+};
 
 export function MyActivityPanel() {
   const [isPending, startTransition] = useTransition();
