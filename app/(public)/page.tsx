@@ -124,9 +124,9 @@ export default async function HomePage() {
               Watch the latest promo and featured game logos.
             </p>
           </div>
-          <div className="flex flex-col items-start gap-4 lg:flex-row lg:items-start">
+          <div className="mx-auto grid w-full max-w-5xl gap-4 md:grid-cols-2">
             {settings?.home_video_url ? (
-              <Card className="w-[280px] overflow-hidden sm:w-[320px]">
+              <Card className="overflow-hidden">
                 <CardContent className="p-0">
                   <video
                     src={settings.home_video_url}
