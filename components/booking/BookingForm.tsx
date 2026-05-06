@@ -15,9 +15,10 @@ import {
   reservationCreateSchema,
 } from "@/lib/reservations/schemas";
 import { createReservation } from "@/actions/reservations";
+import { getUserActivity } from "@/actions/activity";
 import { getOrCreateGuestToken } from "@/lib/guest/client";
 import { CalendarView } from "./CalendarView";
-import { toDateTimeLocalInput } from "@/lib/dates";
+import { formatDateTime, toDateTimeLocalInput } from "@/lib/dates";
 import { useI18n } from "@/components/providers/I18nProvider";
 
 type Props = {
@@ -39,6 +40,15 @@ export function BookingForm({ devices }: Props) {
   const { t } = useI18n();
   const [isPending, startTransition] = useTransition();
   const [calendarTick, setCalendarTick] = useState(0);
+  const [previousReservations, setPreviousReservations] = useState<
+    Array<{
+      id: string;
+      device_name: string;
+      start_time: string;
+      end_time: string;
+      created_at: string;
+    }>
+  >([]);
 
   const defaultStart = useMemo(() => {
     const d = new Date();
@@ -70,6 +80,16 @@ export function BookingForm({ devices }: Props) {
       form.setValue("deviceIds", [devices[0].id]);
     }
   }, [deviceIds, devices, form]);
+
+  useEffect(() => {
+    const loadPrevious = async () => {
+      getOrCreateGuestToken();
+      const result = await getUserActivity();
+      if (!result.ok) return;
+      setPreviousReservations(result.data.reservations.slice(0, 5));
+    };
+    void loadPrevious();
+  }, []);
 
   const handleCalendarSelect = (start: Date, end: Date) => {
     const duration = Math.max(1, Math.round((end.getTime() - start.getTime()) / 3600000));
@@ -107,6 +127,10 @@ export function BookingForm({ devices }: Props) {
       toast.success(t.book.reservationConfirmed, {
         description: t.book.seeYouSoon,
       });
+      const activity = await getUserActivity();
+      if (activity.ok) {
+        setPreviousReservations(activity.data.reservations.slice(0, 5));
+      }
       form.reset({
         ...form.getValues(),
         customerName: "",
@@ -374,6 +398,23 @@ export function BookingForm({ devices }: Props) {
               </p>
             ) : null}
           </form>
+
+          {previousReservations.length > 0 ? (
+            <div className="space-y-2 border-t border-white/10 pt-4">
+              <p className="text-sm font-medium">Previous reservations</p>
+              <div className="space-y-2">
+                {previousReservations.map((reservation) => (
+                  <div
+                    key={reservation.id}
+                    className="rounded-md border border-white/10 bg-white/5 px-3 py-2 text-xs text-muted-foreground"
+                  >
+                    <span className="font-medium text-foreground">{reservation.device_name}</span>{" "}
+                    - {formatDateTime(reservation.start_time)} to {formatDateTime(reservation.end_time)}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </CardContent>
       </Card>
 

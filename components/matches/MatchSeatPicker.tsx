@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -20,7 +20,9 @@ import {
   type MatchSeatReservationInput,
 } from "@/lib/matches/schemas";
 import { createMatchSeatReservation } from "@/actions/matches";
+import { getUserActivity } from "@/actions/activity";
 import { getOrCreateGuestToken } from "@/lib/guest/client";
+import { formatDateTime } from "@/lib/dates";
 
 type Props = {
   matchId: string;
@@ -33,6 +35,14 @@ export function MatchSeatPicker({ matchId, reservedSeats }: Props) {
   const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [previousMatchReservations, setPreviousMatchReservations] = useState<
+    Array<{
+      id: string;
+      match_title: string;
+      seat_number: number;
+      created_at: string;
+    }>
+  >([]);
   const reserved = useMemo(() => new Set(reservedSeats), [reservedSeats]);
 
   const form = useForm<MatchSeatReservationInput>({
@@ -44,6 +54,16 @@ export function MatchSeatPicker({ matchId, reservedSeats }: Props) {
       seats: [],
     },
   });
+
+  useEffect(() => {
+    const loadPrevious = async () => {
+      getOrCreateGuestToken();
+      const result = await getUserActivity();
+      if (!result.ok) return;
+      setPreviousMatchReservations(result.data.matchReservations.slice(0, 8));
+    };
+    void loadPrevious();
+  }, []);
 
   const toggleSeat = (seat: number) => {
     if (reserved.has(seat)) return;
@@ -74,6 +94,10 @@ export function MatchSeatPicker({ matchId, reservedSeats }: Props) {
         return;
       }
       toast.success("Seats reserved successfully.");
+      const activity = await getUserActivity();
+      if (activity.ok) {
+        setPreviousMatchReservations(activity.data.matchReservations.slice(0, 8));
+      }
       form.reset({ matchId, customerName: "", customerPhone: "", seats: [] });
       setSelectedSeats([]);
       setOpen(false);
@@ -156,6 +180,23 @@ export function MatchSeatPicker({ matchId, reservedSeats }: Props) {
           </form>
         </DialogContent>
       </Dialog>
+
+      {previousMatchReservations.length > 0 ? (
+        <div className="space-y-2 border-t border-white/10 pt-4">
+          <p className="text-sm font-medium">Your previous seat reservations</p>
+          <div className="space-y-2">
+            {previousMatchReservations.map((reservation) => (
+              <div
+                key={reservation.id}
+                className="rounded-md border border-white/10 bg-white/5 px-3 py-2 text-xs text-muted-foreground"
+              >
+                <span className="font-medium text-foreground">{reservation.match_title}</span> - Seat{" "}
+                {reservation.seat_number} - {formatDateTime(reservation.created_at)}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
