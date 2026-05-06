@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { DownloadPriceCalculator } from "@/components/admin/DownloadPriceCalculator";
 import { listDownloadRequests } from "@/lib/supabase/data";
 import { formatDateTime } from "@/lib/dates";
 
@@ -19,6 +20,8 @@ export default async function AdminDownloadsPage() {
           Requests submitted by users for games, series, and films.
         </p>
       </div>
+
+      <DownloadPriceCalculator />
 
       <Card>
         <CardContent className="p-0">
